@@ -1,352 +1,239 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Siap Antar, Siap Jemput & Siap Suruh</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
-    }
-
-    header {
-      background: linear-gradient(45deg, #009688, #ff9800);
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .container {
-      padding: 10px;
-    }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .menu-item {
-      background: white;
-      border-radius: 10px;
-      text-align: center;
-      padding: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      cursor: pointer;
-    }
-
-    .menu-item img {
-      width: 60px;
-      height: 60px;
-      margin-bottom: 5px;
-    }
-
-    .menu-item span {
-      display: block;
-      font-size: 14px;
-      color: #333;
-    }
-
-    /* Popup */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      background: rgba(0,0,0,0.5);
-    }
-
-    .modal-content {
-      background: white;
-      margin: 50px auto;
-      border-radius: 10px;
-      padding: 15px;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    .close {
-      float: right;
-      font-size: 20px;
-      cursor: pointer;
-    }
-
-    label {
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-lokasi {
-      background: #ff9800;
-    }
-
-    .btn-kirim {
-      background: #009688;
-      margin-top: 10px;
-    }
-
-    #map {
-      width: 100%;
-      height: 200px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    /* Bottom Navigation */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      border-top: 1px solid #ccc;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-    }
-
-    .bottom-nav a {
-      text-decoration: none;
-      color: #555;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .bottom-nav a:hover {
-      color: #009688;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siap Antar, Siap Jemput & Siap Suruh</title>
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f7f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: linear-gradient(90deg, #ff7b00, #00b894);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 18px;
+}
+.container {
+  padding: 15px;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 10px;
+}
+.menu-item {
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.menu-item img {
+  width: 60px;
+  height: 60px;
+}
+.menu-item p {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  overflow-y: auto;
+}
+.popup-content {
+  background: #fff;
+  margin: 60px auto;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+button {
+  background: #ff7b00;
+  border: none;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover {
+  background: #ff9500;
+}
+.map-container {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+.navbar button {
+  width: 30%;
+  font-size: 14px;
+  border-radius: 8px;
+  background: #00b894;
+}
+.navbar button.chat {
+  background: #ff7b00;
+}
+</style>
 </head>
 <body>
-  <header>Siap Antar, Siap Jemput & Siap Suruh</header>
 
-  <div class="container">
-    <div class="menu-grid">
-      <div class="menu-item" onclick="openForm('Antar Jemput', true)">
-        <img src="https://cdn-icons-png.flaticon.com/512/3039/3039395.png" alt="">
-        <span>Antar Jemput</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Kirim Paket', true)">
-        <img src="https://cdn-icons-png.flaticon.com/512/714/714390.png" alt="">
-        <span>Kirim Paket</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Bersih Rumah', false)">
-        <img src="https://cdn-icons-png.flaticon.com/512/1048/1048945.png" alt="">
-        <span>Bersih Rumah</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Bersihin Kebun', false)">
-        <img src="https://cdn-icons-png.flaticon.com/512/3176/3176362.png" alt="">
-        <span>Bersihin Kebun</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Tambal Ban', false)">
-        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069170.png" alt="">
-        <span>Tambal Ban</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Tukang', false)">
-        <img src="https://cdn-icons-png.flaticon.com/512/3199/3199958.png" alt="">
-        <span>Tukang</span>
-      </div>
-      <div class="menu-item" onclick="openForm('Jaga Rumah', false)">
-        <img src="https://cdn-icons-png.flaticon.com/512/1067/1067566.png" alt="">
-        <span>Jaga Rumah</span>
-      </div>
+<header>🚗 Siap Antar, Siap Jemput & Siap Suruh</header>
+
+<div class="container">
+  <div class="menu-grid">
+    <div class="menu-item" onclick="openPopup('Antar Jemput')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2972/2972185.png">
+      <p>Antar Jemput</p>
+    </div>
+    <div class="menu-item" onclick="openPopup('Kirim Paket')">
+      <img src="https://cdn-icons-png.flaticon.com/512/679/679720.png">
+      <p>Kirim Paket</p>
+    </div>
+    <div class="menu-item" onclick="openPopup('Bersih-Bersih')">
+      <img src="https://cdn-icons-png.flaticon.com/512/809/809957.png">
+      <p>Bersih-Bersih</p>
+    </div>
+    <div class="menu-item" onclick="openPopup('Bersihin Kebun')">
+      <img src="https://cdn-icons-png.flaticon.com/512/3194/3194834.png">
+      <p>Bersihin Kebun</p>
+    </div>
+    <div class="menu-item" onclick="openPopup('Tambal Ban')">
+      <img src="https://cdn-icons-png.flaticon.com/512/9131/9131734.png">
+      <p>Tambal Ban</p>
+    </div>
+    <div class="menu-item" onclick="openPopup('Tukang')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1802/1802979.png">
+      <p>Tukang</p>
     </div>
   </div>
+</div>
 
-  <!-- Popup Form -->
-  <div id="popupForm" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeForm()">&times;</span>
-      <h3 id="formTitle">Pesanan</h3>
+<div class="popup" id="popupForm">
+  <div class="popup-content">
+    <h3>Form Pesanan</h3>
+    <input type="text" id="nama" placeholder="Nama Pemesan">
+    <input type="text" id="layanan" readonly>
+    <input type="text" id="lokasiUrl" placeholder="Titik Jemput (URL Maps)">
+    <button type="button" onclick="getLocation()">📍 Set Lokasi Jemput</button>
+    <input type="text" id="detailAlamat" placeholder="Detail Alamat">
+    <input type="text" id="tujuan" placeholder="Alamat Tujuan">
+    <input type="number" id="jarak" placeholder="Perkiraan Jarak (KM)" oninput="updateBiaya()">
+    <input type="text" id="biaya" placeholder="Estimasi Biaya Otomatis" readonly>
+    
+    <select id="metode">
+      <option value="CASH DRIVER">CASH DRIVER</option>
+      <option value="TRANSFER">TRANSFER</option>
+      <option value="QRIS">QRIS</option>
+    </select>
 
-      <label>Nama:</label>
-      <input id="nama" placeholder="Nama Anda">
-
-      <label>Jasa yang dipilih:</label>
-      <input id="jenisJasa" readonly>
-
-      <label>Titik Jemput:</label>
-      <input id="titikJemput" readonly>
-      <button class="btn-lokasi" onclick="setLokasi('jemput')">📍 Set Lokasi Jemput</button>
-
-      <label>Alamat Tujuan:</label>
-      <input id="titikTujuan" placeholder="Masukkan alamat tujuan">
-      <button class="btn-lokasi" onclick="setLokasi('tujuan')">🎯 Set Lokasi Tujuan</button>
-
-      <div id="map"></div>
-
-      <div id="fieldJarak" style="display:none;">
-        <label>Estimasi Biaya Otomatis:</label>
-        <input id="estimasiBiaya" readonly placeholder="Estimasi akan muncul otomatis">
-      </div>
-
-      <div id="fieldNego" style="display:none;">
-        <label>Pertanyaan atau kebutuhan jasa:</label>
-        <textarea id="pertanyaan" placeholder="Tulis kebutuhan jasa Anda..."></textarea>
-      </div>
-
-      <label>Metode Bayar:</label>
-      <select id="metodeBayar">
-        <option>CASH DRIVER</option>
-        <option>TRANSFER</option>
-        <option>QRIS</option>
-      </select>
-
-      <button class="btn-kirim" onclick="kirimPesanan()">Kirim Pesanan</button>
-    </div>
+    <div class="map-container" id="map"></div>
+    <button onclick="kirimPesanan()">Kirim Pesanan</button>
+    <button onclick="closePopup()" style="background:#999;margin-top:8px;">Tutup</button>
   </div>
+</div>
 
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <a href="#">🏠 Home</a>
-    <a href="#" onclick="openForm('Pesanan Saya', false)">📋 Pesanan</a>
-    <a href="https://wa.me/6281262433533" target="_blank">💬 Chat Admin</a>
-  </div>
+<div class="navbar">
+  <button onclick="window.location.reload()">🏠 Home</button>
+  <button class="chat" onclick="window.open('https://wa.me/6281262433533','_blank')">💬 Chat Admin</button>
+  <button onclick="alert('Fitur Pesanan Aktif')">📦 Pesanan</button>
+</div>
 
-  <script>
-    let isOtomatis = false;
-    let origin = null;
-    let destination = null;
-    let map;
-    let marker;
-    let service;
-    const hargaPerKm = 4000;
+<script>
+let selectedService = "";
 
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -0.7893, lng: 113.9213 },
-        zoom: 5,
-      });
-      service = new google.maps.DistanceMatrixService();
-    }
+function openPopup(service) {
+  selectedService = service;
+  document.getElementById('popupForm').style.display = 'block';
+  document.getElementById('layanan').value = service;
+  document.getElementById('biaya').value = "";
+}
 
-    function openForm(jasa, otomatis) {
-      document.getElementById("popupForm").style.display = "block";
-      document.getElementById("formTitle").innerText = jasa;
-      document.getElementById("jenisJasa").value = jasa;
-      isOtomatis = otomatis;
-      document.getElementById("fieldJarak").style.display = otomatis ? "block" : "none";
-      document.getElementById("fieldNego").style.display = otomatis ? "none" : "block";
-    }
+function closePopup() {
+  document.getElementById('popupForm').style.display = 'none';
+}
 
-    function closeForm() {
-      document.getElementById("popupForm").style.display = "none";
-    }
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+      document.getElementById('lokasiUrl').value = mapUrl;
 
-    function setLokasi(type) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (pos) {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const url = `https://www.google.com/maps?q=${lat},${lng}`;
+      const mapDiv = document.getElementById("map");
+      mapDiv.innerHTML = `<iframe width="100%" height="200" style="border:0;" loading="lazy"
+        src="https://www.google.com/maps?q=${lat},${lng}&hl=id&z=15&output=embed"></iframe>`;
+    });
+  } else {
+    alert("Browser tidak mendukung GPS.");
+  }
+}
 
-          if (type === "jemput") {
-            document.getElementById("titikJemput").value = url;
-            origin = new google.maps.LatLng(lat, lng);
-          } else {
-            document.getElementById("titikTujuan").value = url;
-            destination = new google.maps.LatLng(lat, lng);
-          }
+function updateBiaya() {
+  const jarak = parseFloat(document.getElementById('jarak').value);
+  const service = selectedService;
+  if (["Antar Jemput", "Kirim Paket"].includes(service) && !isNaN(jarak)) {
+    let biaya = jarak * 4000;
+    const sisa = biaya % 1000;
+    if (sisa >= 500) biaya += (1000 - sisa);
+    else biaya -= sisa;
+    document.getElementById('biaya').value = biaya.toLocaleString('id-ID');
+  } else {
+    document.getElementById('biaya').value = "Nego dengan petugas";
+  }
+}
 
-          map.setCenter({ lat, lng });
-          map.setZoom(15);
-          if (marker) marker.setMap(null);
-          marker = new google.maps.Marker({ position: { lat, lng }, map });
+function kirimPesanan() {
+  const nama = document.getElementById('nama').value || "-";
+  const layanan = document.getElementById('layanan').value;
+  const lokasi = document.getElementById('lokasiUrl').value || "-";
+  const detail = document.getElementById('detailAlamat').value || "-";
+  const tujuan = document.getElementById('tujuan').value || "-";
+  const jarak = document.getElementById('jarak').value || "0";
+  const biaya = document.getElementById('biaya').value || "Nego";
+  const metode = document.getElementById('metode').value;
 
-          if (isOtomatis && origin && destination) {
-            hitungJarakDanBiaya();
-          }
-        });
-      } else {
-        alert("Browser tidak mendukung geolokasi");
-      }
-    }
+  const pesan = `Halo Admin, saya ingin pesan jasa ${layanan}.\n\nNama: ${nama}\nLokasi Jemput: ${lokasi}\nDetail: ${detail}\nTujuan: ${tujuan}\nJarak: ${jarak} KM\nPerkiraan Biaya: ${biaya}\nMetode Bayar: ${metode}`;
+  
+  const waUrl = `https://wa.me/6281262433533?text=${encodeURIComponent(pesan)}`;
+  window.open(waUrl, "_blank");
+}
+</script>
 
-    function hitungJarakDanBiaya() {
-      if (!origin || !destination) return;
-
-      service.getDistanceMatrix(
-        {
-          origins: [origin],
-          destinations: [destination],
-          travelMode: google.maps.TravelMode.DRIVING,
-        },
-        function (response, status) {
-          if (status === "OK") {
-            const distanceValue = response.rows[0].elements[0].distance.value / 1000;
-            let biaya = distanceValue * hargaPerKm;
-
-            const sisa = biaya % 1000;
-            if (sisa >= 500) biaya += 1000 - sisa;
-            else biaya -= sisa;
-
-            document.getElementById("estimasiBiaya").value = "Rp " + biaya.toLocaleString("id-ID");
-            document.getElementById("estimasiBiaya").dataset.value = biaya;
-          }
-        }
-      );
-    }
-
-    function kirimPesanan() {
-      const nama = document.getElementById("nama").value;
-      const jasa = document.getElementById("jenisJasa").value;
-      const jemput = document.getElementById("titikJemput").value;
-      const tujuan = document.getElementById("titikTujuan").value;
-      const metode = document.getElementById("metodeBayar").value;
-      const biaya = document.getElementById("estimasiBiaya").dataset.value || "";
-      const pertanyaan = document.getElementById("pertanyaan").value;
-
-      let pesan = "";
-
-      if (isOtomatis) {
-        pesan = `Halo Admin, saya *${nama}* ingin memesan jasa *${jasa}*.
-📍 Jemput: ${jemput}
-🎯 Tujuan: ${tujuan}
-💰 Estimasi Biaya: Rp ${parseInt(biaya).toLocaleString("id-ID")}
-💳 Metode Bayar: ${metode}`;
-      } else {
-        pesan = `Halo Admin, saya *${nama}* ingin menanyakan harga untuk jasa *${jasa}*.
-📝 Keterangan: ${pertanyaan}
-📍 Lokasi: ${jemput}`;
-      }
-
-      const url = `https://wa.me/6281262433533?text=${encodeURIComponent(pesan)}`;
-      window.open(url, "_blank");
-    }
-  </script>
-
-  <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDH5Jbl6_m6nHshJEyE1QRspbfZ4Mjbxwg&callback=initMap">
-  </script>
 </body>
 </html>
