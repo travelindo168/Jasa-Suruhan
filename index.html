@@ -315,7 +315,7 @@
     function hitungJarak() {
       if (latJemput && lonJemput && latTujuan && lonTujuan) {
         const jarak = haversine(latJemput, lonJemput, latTujuan, lonTujuan);
-        const biayaAwal = jarak * 4000;
+        const biayaAwal = jarak * 6000;
         let biaya = biayaAwal - (biayaAwal % 1000) + (biayaAwal % 1000 > 500 ? 1000 : 0);
         biaya = Math.max(1000, biaya);
         document.getElementById("jarakTxt").innerText = jarak.toFixed(2);
