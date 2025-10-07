@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Siap Antar, Siap Jemput & Siap Suruh</title>
 
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <style>
     body {
       background-color: #f8f9fa;
@@ -27,19 +31,8 @@
     header h4 { margin: 0; font-size: 16px; }
 
     /* BANNER */
-    .banner {
-      width: 100%;
-      overflow: hidden;
-      margin-top: 10px;
-      border-radius: 10px;
-      position: relative;
-    }
-
-    .banner img {
-      width: 100%;
-      border-radius: 10px;
-      display: none;
-    }
+    .banner { width: 100%; overflow: hidden; margin-top: 10px; border-radius: 10px; position: relative; }
+    .banner img { width: 100%; border-radius: 10px; display: none; }
     .banner img.active { display: block; }
 
     /* GRID MENU */
@@ -49,7 +42,6 @@
       gap: 15px;
       margin: 20px;
     }
-
     .kategori-item {
       background: white;
       border-radius: 15px;
@@ -58,7 +50,6 @@
       text-align: center;
       transition: transform 0.2s;
     }
-
     .kategori-item:hover { transform: scale(1.05); }
     .kategori-item img { width: 55px; height: 55px; margin-bottom: 8px; }
     .kategori-item span { font-size: 13px; color: #333; font-weight: 600; }
@@ -81,9 +72,9 @@
       background-color: #fff;
       margin: auto;
       border-radius: 15px;
-      width: 90%;
-      max-width: 400px;
-      max-height: 85vh;
+      width: 95%;
+      max-width: 450px;
+      max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       position: relative;
@@ -126,10 +117,13 @@
       margin-top: 8px;
       cursor: pointer;
     }
-
     button:hover { background-color: #e56e00; }
 
-    .map-container iframe { border-radius: 10px; }
+    #map {
+      height: 250px;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
 
     /* TOAST */
     .toast {
@@ -149,18 +143,12 @@
       opacity: 0;
       transition: opacity 0.5s, bottom 0.5s;
     }
-    .toast.show {
-      visibility: visible;
-      opacity: 1;
-      bottom: 100px;
-    }
+    .toast.show { visibility: visible; opacity: 1; bottom: 100px; }
 
     /* BOTTOM NAV */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: #fff;
       border-top: 1px solid #ddd;
       display: flex;
@@ -168,7 +156,6 @@
       padding: 8px 0;
       box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
     }
-
     .bottom-nav a {
       text-decoration: none;
       color: #28a745;
@@ -177,18 +164,12 @@
       flex-direction: column;
       align-items: center;
     }
-
-    .bottom-nav span {
-      font-size: 12px;
-      color: #333;
-    }
+    .bottom-nav span { font-size: 12px; color: #333; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h4>Siap Antar, Siap Jemput & Siap Suruh</h4>
-  </header>
+  <header><h4>Siap Antar, Siap Jemput & Siap Suruh</h4></header>
 
   <div class="banner">
     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhRChNVFEnMamg4xeg_J9Fkr_3I93wxxk4o6XlG1z8FMwSPS0mlpsb2yPdXa3zdSM5edvwKiUfp36e8LbDary6mH6uUOTVCSsaT5beEW9Qly3xn7CIaToNsZa63wsUHP5q9hjmrG-QhLHN066qercKNZu2ATqe__2R87rdTm4EiWR19DcsFuIddMjyY0bI/s1536/IMG_20251005_083246.png" class="active">
@@ -224,32 +205,30 @@
       <span class="close" onclick="tutupForm()">&times;</span>
       <h4 id="judulForm">Form Pesanan</h4>
 
-      <input type="text" id="nama" placeholder="Nama Lengkap" required>
-      <input type="text" id="titikJemput" placeholder="Titik Jemput (Klik Set Lokasi)" readonly>
-      <button onclick="setLokasi()">📍 Set Lokasi Jemput</button>
-      <textarea id="alamatDetail" placeholder="Detail Alamat Jemput"></textarea>
-      <input type="text" id="alamatTujuan" placeholder="Alamat Tujuan">
+      <div id="formUmum">
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <div id="bagianMap" style="display:none;">
+          <div id="map"></div>
+          <button onclick="getCurrentLocation()">📍 Ambil Lokasi Jemput</button>
+          <input type="text" id="lokasiJemput" placeholder="Link Lokasi Jemput" readonly>
+          <input type="text" id="lokasiTujuan" placeholder="Klik peta untuk pilih tujuan" readonly>
+          <p><b>Jarak:</b> <span id="jarakTxt">-</span> km</p>
+          <p><b>Biaya:</b> <span id="biayaTxt">-</span></p>
+        </div>
 
-      <div id="bagianJarak">
-        <input type="number" id="jarak" placeholder="Perkiraan Jarak (km)" min="1">
-        <input type="text" id="estimasi" placeholder="Estimasi Biaya Otomatis" readonly>
+        <div id="bagianTanya" style="display:none;">
+          <textarea id="pertanyaan" placeholder="Tulis kebutuhan jasa..."></textarea>
+        </div>
+
+        <select id="metodeBayar">
+          <option value="CASH DRIVER">CASH DRIVER</option>
+          <option value="TRANSFER">TRANSFER</option>
+          <option value="QRIS">QRIS</option>
+        </select>
+
+        <textarea id="catatan" placeholder="Catatan tambahan (opsional)"></textarea>
+        <button onclick="kirimPesanan()">Kirim Pesanan</button>
       </div>
-
-      <div id="bagianPertanyaan" style="display:none;">
-        <textarea id="pertanyaan" placeholder="Tulis pertanyaan atau kebutuhan jasa..."></textarea>
-      </div>
-
-      <select id="metodeBayar">
-        <option value="CASH DRIVER">CASH DRIVER</option>
-        <option value="TRANSFER">TRANSFER</option>
-        <option value="QRIS">QRIS</option>
-      </select>
-
-      <div class="map-container" id="mapViewContainer" style="display:none;">
-        <iframe id="viewMap" width="100%" height="200" style="border:0;" allowfullscreen loading="lazy"></iframe>
-      </div>
-
-      <button onclick="kirimPesanan()">Kirim Pesanan</button>
     </div>
   </div>
 
@@ -262,7 +241,8 @@
   </nav>
 
   <script>
-    let layananDipilih = "", lat = "", lon = "";
+    let layananDipilih = "", map, markerJemput, markerTujuan;
+    let latJemput, lonJemput, latTujuan, lonTujuan;
 
     const slides = document.querySelectorAll('.banner img');
     let slideIndex = 0;
@@ -278,11 +258,12 @@
       document.getElementById("popupForm").style.display = "flex";
 
       if (layanan === "Antar Jemput" || layanan === "Kirim Paket") {
-        document.getElementById("bagianJarak").style.display = "block";
-        document.getElementById("bagianPertanyaan").style.display = "none";
+        document.getElementById("bagianMap").style.display = "block";
+        document.getElementById("bagianTanya").style.display = "none";
+        initMap();
       } else {
-        document.getElementById("bagianJarak").style.display = "none";
-        document.getElementById("bagianPertanyaan").style.display = "block";
+        document.getElementById("bagianMap").style.display = "none";
+        document.getElementById("bagianTanya").style.display = "block";
       }
     }
 
@@ -290,46 +271,81 @@
       document.getElementById("popupForm").style.display = "none";
     }
 
-    function setLokasi() {
+    function initMap() {
+      if (!map) {
+        map = L.map('map').setView([-6.2, 106.816666], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: 'Data © OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', function(e) {
+          latTujuan = e.latlng.lat;
+          lonTujuan = e.latlng.lng;
+          if (markerTujuan) map.removeLayer(markerTujuan);
+          markerTujuan = L.marker([latTujuan, lonTujuan]).addTo(map).bindPopup("Titik Tujuan").openPopup();
+          document.getElementById("lokasiTujuan").value = `https://www.google.com/maps?q=${latTujuan},${lonTujuan}`;
+          hitungJarak();
+        });
+      }
+    }
+
+    function getCurrentLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
-          lat = pos.coords.latitude;
-          lon = pos.coords.longitude;
-          const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-          document.getElementById("titikJemput").value = mapUrl;
+          latJemput = pos.coords.latitude;
+          lonJemput = pos.coords.longitude;
+          if (markerJemput) map.removeLayer(markerJemput);
+          markerJemput = L.marker([latJemput, lonJemput]).addTo(map).bindPopup("Titik Jemput").openPopup();
+          document.getElementById("lokasiJemput").value = `https://www.google.com/maps?q=${latJemput},${lonJemput}`;
+          map.setView([latJemput, lonJemput], 14);
+        }, () => alert("Gagal ambil lokasi."));
+      } else alert("Browser tidak mendukung geolokasi.");
+    }
 
-          const iframe = document.getElementById("viewMap");
-          document.getElementById("mapViewContainer").style.display = "block";
-          iframe.src = `https://www.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
-        }, () => alert("Izin lokasi ditolak"));
-      } else alert("Browser tidak mendukung lokasi");
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function hitungJarak() {
+      if (latJemput && lonJemput && latTujuan && lonTujuan) {
+        const jarak = haversine(latJemput, lonJemput, latTujuan, lonTujuan);
+        const biayaAwal = jarak * 4000;
+        let biaya = biayaAwal - (biayaAwal % 1000) + (biayaAwal % 1000 > 500 ? 1000 : 0);
+        biaya = Math.max(1000, biaya);
+        document.getElementById("jarakTxt").innerText = jarak.toFixed(2);
+        document.getElementById("biayaTxt").innerText = "Rp " + biaya.toLocaleString("id-ID");
+      }
     }
 
     function kirimPesanan() {
       const nama = document.getElementById("nama").value;
-      const titik = document.getElementById("titikJemput").value;
-      const alamat = document.getElementById("alamatDetail").value;
-      const tujuan = document.getElementById("alamatTujuan").value;
-      const metode = document.getElementById("metodeBayar").value;
-      const pertanyaan = document.getElementById("pertanyaan").value;
-      const jarak = parseFloat(document.getElementById("jarak").value) || 0;
+      const bayar = document.getElementById("metodeBayar").value;
+      const catatan = document.getElementById("catatan").value;
 
-      if (!nama || !titik) return alert("Lengkapi nama dan titik jemput!");
-
-      let pesan = `Halo Admin,%0A%0A🧾 *Pesanan ${layananDipilih}*%0A👤 Nama: ${nama}%0A📍 Titik Jemput: ${titik}%0A🏠 Alamat: ${alamat}%0A`;
+      if (!nama) return alert("Isi nama lengkap dulu!");
 
       if (layananDipilih === "Antar Jemput" || layananDipilih === "Kirim Paket") {
-        if (!tujuan || !jarak) return alert("Isi alamat tujuan & jarak!");
-        let biaya = Math.round(jarak * 4000);
-        const sisa = biaya % 1000;
-        if (sisa >= 500) biaya += 1000 - sisa;
-        else biaya -= sisa;
-        pesan += `🎯 Tujuan: ${tujuan}%0A📏 Jarak: ${jarak} km%0A💰 Estimasi: Rp ${biaya.toLocaleString()}%0A💳 Bayar: ${metode}`;
+        const jemput = document.getElementById("lokasiJemput").value;
+        const tujuan = document.getElementById("lokasiTujuan").value;
+        const jarak = document.getElementById("jarakTxt").innerText;
+        const biaya = document.getElementById("biayaTxt").innerText;
+
+        if (!jemput || !tujuan) return alert("Tentukan lokasi jemput dan tujuan!");
+
+        const pesan = `🛵 *Pesanan ${layananDipilih}*%0A👤 Nama: ${nama}%0A📍 Jemput: ${jemput}%0A🎯 Tujuan: ${tujuan}%0A📏 Jarak: ${jarak} km%0A💰 Biaya: ${biaya}%0A💳 Pembayaran: ${bayar}%0A📝 Catatan: ${catatan}`;
+        window.open(`https://wa.me/6281262433533?text=${pesan}`, "_blank");
       } else {
-        pesan += `📝 Kebutuhan: ${pertanyaan || "(Belum diisi)"}%0A💬 Biaya: *Nego dulu dengan petugas*`;
+        const pertanyaan = document.getElementById("pertanyaan").value;
+        const pesan = `🧾 *Pesanan ${layananDipilih}*%0A👤 Nama: ${nama}%0A📝 Kebutuhan: ${pertanyaan}%0A💳 Pembayaran: ${bayar}%0A💬 Catatan: ${catatan}`;
+        window.open(`https://wa.me/6281262433533?text=${pesan}`, "_blank");
       }
 
-      window.open(`https://wa.me/6281262433533?text=${pesan}`, "_blank");
       showToast();
     }
 
