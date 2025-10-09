@@ -1,197 +1,301 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SIAP SURUH, SIAP ANTAR</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Siap Suruh - Siap Antar</title>
 
-  <!-- Bootstrap 5 -->
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
-    :root{--green:#2db84c;--orange:#ff8a00;--white:#ffffff;}
-    body{background:linear-gradient(180deg,#eaffea,#fff7ec);font-family:system-ui,Segoe UI,Roboto,Arial;margin-bottom:92px;}
-    .top-banner{background:linear-gradient(90deg,var(--green),var(--orange));color:#fff;padding:16px;border-radius:0 0 14px 14px}
-    .category-row{display:flex;gap:10px;overflow-x:auto;padding:12px}
-    .cat-card{min-width:120px;background:#fff;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,0.06);padding:12px;text-align:center;cursor:pointer}
-    .icon-box{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;margin:0 auto 6px}
-    .bottom-nav{position:fixed;left:12px;right:12px;bottom:12px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.08);padding:8px;display:flex;justify-content:space-around;z-index:999}
-    .map-full{height:60vh;border-radius:8px}
-    .small-link{font-size:0.85rem;word-break:break-all}
-    .tarif-box{background:#fff;border-radius:10px;padding:10px;box-shadow:0 6px 14px rgba(0,0,0,0.04)}
-    .btn-green{background:var(--green);color:#fff;border:0}
-    .btn-orange{background:var(--orange);color:#fff;border:0}
+    :root{
+      --brand-green:#1fa66a;
+      --brand-orange:#ff7a00;
+      --brand-white:#ffffff;
+    }
+    body { background: #f8f9fa; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .app-banner{
+      background: linear-gradient(90deg,var(--brand-green),var(--brand-orange));
+      color: var(--brand-white);
+      padding: 18px 14px;
+      border-radius: 0 0 18px 18px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .app-title { font-weight:700; font-size:18px; }
+    .card-menu { border-radius:14px; }
+    .menu-btn { text-align:center; padding:10px; cursor:pointer; }
+    .menu-icon { font-size:26px; display:block; margin-bottom:6px; }
+    .bottom-nav { position:fixed; left:0; right:0; bottom:0; padding:8px 14px; background:#fff; box-shadow:0 -6px 20px rgba(0,0,0,0.06); border-top-left-radius:12px; border-top-right-radius:12px; }
+    #mapModal .modal-dialog { max-width:420px; margin:1rem auto; }
+    #map { height:320px; width:100%; border-radius:8px; }
+    .small-note { font-size:12px; color:#666; }
+    .rounded-btn { border-radius:12px; }
+    .link-loc { word-break:break-all; font-size:13px; }
+    .modal-backdrop.show { opacity:0.25; }
+    .floating-help { position:fixed; right:14px; bottom:78px; z-index:1200; }
   </style>
 </head>
 <body>
 
-  <div class="container-fluid px-3">
-    <div class="top-banner text-center">
-      <h4 class="mb-0">SIAP SURUH, SIAP ANTAR</h4>
-      <small>layanan suruhan & antar cepat</small>
+  <!-- Banner -->
+  <header class="app-banner">
+    <div>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path d="M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <path d="M5 7h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <path d="M5 17h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </div>
+    <div>
+      <div class="app-title">SIAP SURUH, SIAP ANTAR</div>
+      <div class="small-note">Layanan cepat: Antar, Kirim, Bersihin & Service</div>
+    </div>
+  </header>
 
-    <div class="mt-3">
-      <div class="category-row">
-        <div class="cat-card" data-bs-toggle="modal" data-bs-target="#modalAntar">
-          <div class="icon-box"><i class="bi bi-bicycle" style="font-size:22px;color:var(--green)"></i></div>
-          <div class="fw-bold">Jasa Antar</div>
-          <small class="text-muted">Antar jemput</small>
-        </div>
-
-        <div class="cat-card" data-bs-toggle="modal" data-bs-target="#modalKirim">
-          <div class="icon-box"><i class="bi bi-box-seam" style="font-size:22px;color:var(--orange)"></i></div>
-          <div class="fw-bold">Kirim Paket</div>
-          <small class="text-muted">Kirim barang</small>
-        </div>
-
-        <div class="cat-card" data-bs-toggle="modal" data-bs-target="#modalBersihRumah">
-          <div class="icon-box"><i class="bi bi-house" style="font-size:22px;color:var(--green)"></i></div>
-          <div class="fw-bold">Bersihin Rumah</div>
-        </div>
-
-        <div class="cat-card" data-bs-toggle="modal" data-bs-target="#modalBersihKebun">
-          <div class="icon-box"><i class="bi bi-tree-fill" style="font-size:22px;color:var(--green)"></i></div>
-          <div class="fw-bold">Bersihin Kebun</div>
-        </div>
-
-        <div class="cat-card" data-bs-toggle="modal" data-bs-target="#modalTempelBan">
-          <div class="icon-box"><i class="bi bi-tools" style="font-size:22px;color:var(--orange)"></i></div>
-          <div class="fw-bold">Tempel Ban</div>
+  <main class="container my-3 mb-5">
+    <!-- Category Grid -->
+    <div class="row g-2">
+      <div class="col-6">
+        <div class="card card-menu p-2" role="button" data-bs-toggle="modal" data-bs-target="#modalAntar">
+          <div class="menu-btn">
+            <i class="bi bi-bicycle menu-icon" style="color:var(--brand-green)"></i>
+            <div class="fw-bold">Jasa Antar</div>
+          </div>
         </div>
       </div>
 
-      <div class="mt-3 px-1">
-        <div class="tarif-box">
-          <div class="fw-semibold">Informasi Tarif</div>
-          <div class="small text-muted">
-            Tarif: <strong>6.000 IDR / km</strong>. Pembulatan ke 1.000 terdekat:
-            jika sisa <strong>&lt; 500</strong> dibulatkan ke bawah, jika sisa <strong>≥ 500</strong> dibulatkan ke atas.
-            (Contoh: 4.450 → 4.000 ; 4.560 → 5.000)
+      <div class="col-6">
+        <div class="card card-menu p-2" role="button" data-bs-toggle="modal" data-bs-target="#modalKirim">
+          <div class="menu-btn">
+            <i class="bi bi-box menu-icon" style="color:var(--brand-orange)"></i>
+            <div class="fw-bold">Kirim Paket</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card card-menu p-2" role="button" data-bs-toggle="modal" data-bs-target="#modalBersihinRumah">
+          <div class="menu-btn">
+            <i class="bi bi-house menu-icon" style="color:#6c757d"></i>
+            <div class="fw-bold">Bersihin Rumah</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card card-menu p-2" role="button" data-bs-toggle="modal" data-bs-target="#modalBersihinKebun">
+          <div class="menu-btn">
+            <i class="bi bi-tree menu-icon" style="color:green"></i>
+            <div class="fw-bold">Bersihin Kebun</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card card-menu p-2" role="button" data-bs-toggle="modal" data-bs-target="#modalTempelBan">
+          <div class="menu-btn">
+            <i class="bi bi-tools menu-icon" style="color:#333"></i>
+            <div class="fw-bold">Tempel Ban</div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Informational Card -->
+    <div class="card mt-3 p-3">
+      <div class="small-note">Cara pakai: Pilih layanan → Set lokasi (pakai GPS atau pilih di peta) → Tarif muncul otomatis → Kirim pesanan via WhatsApp ke admin.</div>
+    </div>
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav d-flex justify-content-between align-items-center">
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <button class="btn btn-light flex-column align-items-center rounded-btn" onclick="scrollToTop()">
+        <i class="bi bi-house-door-fill" style="font-size:18px;color:var(--brand-green)"></i>
+        <div style="font-size:12px">Home</div>
+      </button>
+      <button class="btn btn-light flex-column align-items-center rounded-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFAQ">
+        <i class="bi bi-question-circle" style="font-size:18px;color:var(--brand-orange)"></i>
+        <div style="font-size:12px">Pertanyaan</div>
+      </button>
+      <button class="btn btn-light flex-column align-items-center rounded-btn" onclick="showProfile()">
+        <i class="bi bi-person-circle" style="font-size:18px;color:#6c757d"></i>
+        <div style="font-size:12px">Profil</div>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Offcanvas FAQ -->
+  <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasFAQ">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Pertanyaan & Bantuan</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body small p-3">
+      <p><strong>Admin WA:</strong> <a href="https://wa.me/6281262433533" target="_blank">+62 812-6243-3533</a></p>
+      <p>Gunakan tombol "Set Lokasi" untuk memilih titik jemput & antar pada peta. Jika ingin mengetik alamat tujuan, gunakan kolom pencarian sebelum atau sesudah memilih lokasi.</p>
+    </div>
   </div>
 
-  <!-- Bottom nav (Home, Pertanyaan, Profil) -->
-  <div class="bottom-nav">
-    <div class="text-center">
-      <div class="fs-4">🏠</div><small>Home</small>
-    </div>
-    <div class="text-center">
-      <div class="fs-4">❓</div><small>Pertanyaan</small>
-    </div>
-    <div class="text-center">
-      <div class="fs-4">👤</div><small>Profil</small>
-    </div>
-  </div>
-
-  <!-- Modals -->
-
-  <!-- Antar / Jemput -->
+  <!-- Modal: Antar Jemput -->
   <div class="modal fade" id="modalAntar" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header" style="background:var(--brand-green); color:white;">
           <h5 class="modal-title">Form Antar Jemput</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <form id="formAntar" onsubmit="return false;">
+          <form id="formAntar">
             <div class="mb-2">
               <label class="form-label">Nama</label>
-              <input id="antar_nama" class="form-control" required>
+              <input type="text" class="form-control" id="antar_nama" required>
             </div>
 
             <div class="mb-2">
               <label class="form-label">Lokasi Jemputan</label>
               <div class="input-group">
-                <input id="antar_jemput" class="form-control" placeholder="Belum diset (klik Set lokasi)" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('antar_jemput')">Set lokasi</button>
+                <input type="text" id="antar_jemput_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('antar','pickup')">Set Lokasi</button>
               </div>
-              <div class="form-text small">Hasil lokasi akan berupa URL (klik untuk buka).</div>
+              <div class="small-note">Lokasi hasil: <span id="antar_jemput_url" class="link-loc"></span></div>
             </div>
 
             <div class="mb-2">
               <label class="form-label">Tujuan Antar</label>
               <div class="input-group">
-                <input id="antar_tujuan" class="form-control" placeholder="Ketik alamat atau Set lokasi">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('antar_tujuan')">Set lokasi</button>
+                <input type="text" id="antar_tujuan_txt" class="form-control" placeholder="Bisa juga ketik alamat lalu cari" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('antar','drop')">Set Lokasi</button>
               </div>
-              <div class="form-text small">Anda dapat mengetik alamat atau set dari peta.</div>
+              <div class="small-note">Atau ketik alamat: <input type="search" id="antar_tujuan_search" placeholder="Cari alamat..." class="form-control form-control-sm mt-1"></div>
+              <div class="small-note">Lokasi hasil: <span id="antar_tujuan_url" class="link-loc"></span></div>
             </div>
 
             <div class="mb-2">
-              <label class="form-label">Estimasi Jarak</label>
-              <input id="antar_estimasi" class="form-control" readonly placeholder="-">
+              <label class="form-label">Estimasi Jarak & Tarif</label>
+              <div class="card p-2">
+                <div>Jarak: <strong id="antar_distance">-</strong> km</div>
+                <div>Tarif (6000/KM): <strong id="antar_fare_display">-</strong></div>
+                <div class="small-note">Pembulatan ke 1000: jika sisa < 500 dibulatkan ke bawah, jika ≥500 dibulatkan ke atas.</div>
+              </div>
             </div>
 
-            <div class="mb-2">
-              <label class="form-label">Tarif</label>
-              <input id="antar_tarif" class="form-control" readonly placeholder="-">
+            <div class="mt-2 d-grid gap-2">
+              <button type="button" class="btn" style="background:var(--brand-green); color:white;" onclick="sendAntarWhatsApp()">Kirim Pesanan via WhatsApp</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
 
-            <div class="d-grid gap-2 mt-2">
-              <button id="antar_send" type="button" class="btn btn-green" onclick="sendOrder('antar')">
-                <i class="bi bi-whatsapp"></i> Kirim Pesanan via WhatsApp
-              </button>
-            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Kirim Paket -->
+  <!-- Modal: Kirim Paket (mirip antar dengan fokus paket) -->
   <div class="modal fade" id="modalKirim" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header" style="background:var(--brand-orange); color:white;">
           <h5 class="modal-title">Form Kirim Paket</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <form id="formKirim" onsubmit="return false;">
+          <form id="formKirim">
             <div class="mb-2">
               <label class="form-label">Nama</label>
-              <input id="kirim_nama" class="form-control" required>
+              <input type="text" class="form-control" id="kirim_nama" required>
             </div>
 
             <div class="mb-2">
-              <label class="form-label">Lokasi Pengirim</label>
+              <label class="form-label">Lokasi Jemput Paket</label>
               <div class="input-group">
-                <input id="kirim_pengirim" class="form-control" readonly placeholder="Belum diset">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('kirim_pengirim')">Set lokasi</button>
+                <input type="text" id="kirim_jemput_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('kirim','pickup')">Set Lokasi</button>
+              </div>
+              <div class="small-note">Lokasi hasil: <span id="kirim_jemput_url" class="link-loc"></span></div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Tujuan Paket</label>
+              <div class="input-group">
+                <input type="text" id="kirim_tujuan_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('kirim','drop')">Set Lokasi</button>
+              </div>
+              <div class="small-note">Atau ketik alamat: <input type="search" id="kirim_tujuan_search" placeholder="Cari alamat..." class="form-control form-control-sm mt-1"></div>
+              <div class="small-note">Lokasi hasil: <span id="kirim_tujuan_url" class="link-loc"></span></div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Estimasi Jarak & Tarif</label>
+              <div class="card p-2">
+                <div>Jarak: <strong id="kirim_distance">-</strong> km</div>
+                <div>Tarif (6000/KM): <strong id="kirim_fare_display">-</strong></div>
               </div>
             </div>
 
             <div class="mb-2">
-              <label class="form-label">Lokasi Penerima</label>
+              <label class="form-label">Deskripsi Paket (opsional)</label>
+              <textarea id="kirim_desc" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="button" class="btn" style="background:var(--brand-orange); color:white;" onclick="sendKirimWhatsApp()">Kirim Pesanan via WhatsApp</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Bersihin Rumah -->
+  <div class="modal fade" id="modalBersihinRumah" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background:#6c757d; color:white;">
+          <h5 class="modal-title">Form Bersihin Rumah</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formBersihinRumah">
+            <div class="mb-2">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control" id="rumah_nama" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Alamat Lengkap</label>
+              <input type="text" class="form-control" id="rumah_alamat" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Set Lokasi</label>
               <div class="input-group">
-                <input id="kirim_penerima" class="form-control" placeholder="Ketik alamat atau Set lokasi">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('kirim_penerima')">Set lokasi</button>
+                <input type="text" id="rumah_lokasi_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('rumah','pickup')">Set Lokasi</button>
               </div>
+              <div class="small-note">Lokasi hasil: <span id="rumah_lokasi_url" class="link-loc"></span></div>
             </div>
-
             <div class="mb-2">
-              <label class="form-label">Estimasi Jarak</label>
-              <input id="kirim_estimasi" class="form-control" readonly placeholder="-">
+              <label class="form-label">Kebutuhan Jasa</label>
+              <textarea id="rumah_kebutuhan" class="form-control" rows="2"></textarea>
             </div>
-
             <div class="mb-2">
-              <label class="form-label">Tarif</label>
-              <input id="kirim_tarif" class="form-control" readonly placeholder="-">
+              <label class="form-label">Pertanyaan Estimasi Biaya</label>
+              <input type="text" id="rumah_pertanyaan" class="form-control">
             </div>
 
             <div class="d-grid gap-2 mt-2">
-              <button type="button" class="btn btn-orange" onclick="sendOrder('kirim')">
-                <i class="bi bi-whatsapp"></i> Kirim Pesanan via WhatsApp
-              </button>
+              <button type="button" class="btn btn-success" onclick="sendGeneralWhatsApp('rumah')">Kirim via WhatsApp</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
           </form>
         </div>
@@ -199,387 +303,467 @@
     </div>
   </div>
 
-  <!-- Bersihin Rumah -->
-  <div class="modal fade" id="modalBersihRumah" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
+  <!-- Modal: Bersihin Kebun -->
+  <div class="modal fade" id="modalBersihinKebun" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Form Bersihin Rumah</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header" style="background:green; color:white;">
+          <h5 class="modal-title">Form Bersihin Kebun</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
-          <form id="formBersihRumah" onsubmit="return false;">
-            <div class="mb-2"><label class="form-label">Nama</label><input id="rumah_nama" class="form-control"></div>
-            <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="rumah_alamat" class="form-control"></div>
+          <form id="formBersihinKebun">
+            <div class="mb-2">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control" id="kebun_nama" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Alamat Lengkap</label>
+              <input type="text" class="form-control" id="kebun_alamat" required>
+            </div>
             <div class="mb-2">
               <label class="form-label">Set Lokasi</label>
               <div class="input-group">
-                <input id="rumah_lokasi" class="form-control" readonly placeholder="Belum diset">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('rumah_lokasi')">Set lokasi</button>
+                <input type="text" id="kebun_lokasi_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('kebun','pickup')">Set Lokasi</button>
               </div>
+              <div class="small-note">Lokasi hasil: <span id="kebun_lokasi_url" class="link-loc"></span></div>
             </div>
-            <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><textarea id="rumah_kebutuhan" class="form-control"></textarea></div>
-            <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="rumah_pertanyaan" class="form-control"></textarea></div>
-            <div class="d-grid gap-2 mt-2"><button class="btn btn-green" type="button" onclick="sendOrder('rumah')"><i class="bi bi-whatsapp"></i> Kirim Pesanan via WhatsApp</button></div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bersihin Kebun -->
-  <div class="modal fade" id="modalBersihKebun" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Form Bersihin Kebun</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-          <form id="formBersihKebun" onsubmit="return false;">
-            <div class="mb-2"><label class="form-label">Nama</label><input id="kebun_nama" class="form-control"></div>
-            <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="kebun_alamat" class="form-control"></div>
             <div class="mb-2">
-              <label class="form-label">Set Lokasi</label>
-              <div class="input-group">
-                <input id="kebun_lokasi" class="form-control" readonly placeholder="Belum diset">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('kebun_lokasi')">Set lokasi</button>
-              </div>
+              <label class="form-label">Kebutuhan Jasa</label>
+              <textarea id="kebun_kebutuhan" class="form-control" rows="2"></textarea>
             </div>
-            <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><textarea id="kebun_kebutuhan" class="form-control"></textarea></div>
-            <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="kebun_pertanyaan" class="form-control"></textarea></div>
-            <div class="d-grid gap-2 mt-2"><button class="btn btn-green" type="button" onclick="sendOrder('kebun')"><i class="bi bi-whatsapp"></i> Kirim Pesanan via WhatsApp</button></div>
+            <div class="mb-2">
+              <label class="form-label">Pertanyaan Estimasi Biaya</label>
+              <input type="text" id="kebun_pertanyaan" class="form-control">
+            </div>
+
+            <div class="d-grid gap-2 mt-2">
+              <button type="button" class="btn btn-success" onclick="sendGeneralWhatsApp('kebun')">Kirim via WhatsApp</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tempel Ban -->
+  <!-- Modal: Tempel Ban -->
   <div class="modal fade" id="modalTempelBan" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Form Tempel Ban</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header" style="background:#343a40; color:white;">
+          <h5 class="modal-title">Form Tempel Ban</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
-          <form id="formTempelBan" onsubmit="return false;">
-            <div class="mb-2"><label class="form-label">Nama</label><input id="ban_nama" class="form-control"></div>
-            <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="ban_alamat" class="form-control"></div>
+          <form id="formTempelBan">
+            <div class="mb-2">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control" id="ban_nama" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Alamat Lengkap</label>
+              <input type="text" class="form-control" id="ban_alamat" required>
+            </div>
             <div class="mb-2">
               <label class="form-label">Set Lokasi</label>
               <div class="input-group">
-                <input id="ban_lokasi" class="form-control" readonly placeholder="Belum diset">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapSetter('ban_lokasi')">Set lokasi</button>
+                <input type="text" id="ban_lokasi_txt" class="form-control" placeholder="Belum diset" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="openMapPicker('ban','pickup')">Set Lokasi</button>
               </div>
+              <div class="small-note">Lokasi hasil: <span id="ban_lokasi_url" class="link-loc"></span></div>
             </div>
-            <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><textarea id="ban_kebutuhan" class="form-control"></textarea></div>
-            <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="ban_pertanyaan" class="form-control"></textarea></div>
-            <div class="d-grid gap-2 mt-2"><button class="btn btn-green" type="button" onclick="sendOrder('ban')"><i class="bi bi-whatsapp"></i> Kirim Pesanan via WhatsApp</button></div>
+            <div class="mb-2">
+              <label class="form-label">Kebutuhan Jasa</label>
+              <textarea id="ban_kebutuhan" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Pertanyaan Estimasi Biaya</label>
+              <input type="text" id="ban_pertanyaan" class="form-control">
+            </div>
+
+            <div class="d-grid gap-2 mt-2">
+              <button type="button" class="btn btn-success" onclick="sendGeneralWhatsApp('ban')">Kirim via WhatsApp</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Map modal (Leaflet) -->
+  <!-- Map Picker Modal (used for all set location actions) -->
   <div class="modal fade" id="mapModal" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Pilih Lokasi pada Peta</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title">Pilih Lokasi di Peta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body p-0">
-          <div id="map" class="map-full"></div>
+        <div class="modal-body">
+          <div id="map"></div>
+          <div class="mt-2 d-flex gap-2">
+            <input type="search" id="map_search" class="form-control" placeholder="Cari alamat (ketik lalu Enter)">
+            <button class="btn btn-primary" id="btnUseMyLoc" type="button">Gunakan GPS</button>
+          </div>
+          <div class="mt-2 small-note">Klik pada peta untuk menaruh pin. Setelah selesai tekan "Konfirmasi Lokasi".</div>
         </div>
         <div class="modal-footer">
-          <button id="use-current-pos" type="button" class="btn btn-outline-secondary">Gunakan Lokasi Saat Ini (GPS)</button>
-          <button id="save-map-pos" type="button" class="btn btn-primary">Simpan Lokasi</button>
+          <button id="confirmLocationBtn" type="button" class="btn btn-success">Konfirmasi Lokasi</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Floating quick WA -->
+  <div class="floating-help">
+    <a href="https://wa.me/6281262433533" target="_blank" class="btn btn-success rounded-pill">
+      <i class="bi bi-whatsapp"></i> Hub Admin
+    </a>
   </div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // ADMIN WA number (no plus sign)
-    const ADMIN_WA = '6281262433533';
+    // Admin WhatsApp number
+    const ADMIN_WA = "6281262433533";
 
-    // Map and selection state
-    let mapInstance = null;
-    let tempMarker = null;
-    let currentTargetInputId = null; // the input that we are setting (e.g., 'antar_jemput', 'antar_tujuan', 'kirim_pengirim' ...)
-    const positionStore = {}; // store lat/lng per input id, e.g., { 'antar_jemput': {lat:...,lng:...}, ... }
+    // State for map picker
+    let pickerState = { context:null, role:null, latlng:null, marker:null };
+    let map, tileLayer;
 
-    // Initialize leaflet when map modal shown
+    // Initialize map modal when first opened
     const mapModalEl = document.getElementById('mapModal');
-    mapModalEl.addEventListener('shown.bs.modal', initializeMap);
+    mapModalEl.addEventListener('shown.bs.modal', function () {
+      setTimeout(() => {
+        if (!map) {
+          initMap();
+        }
+        map.invalidateSize();
+      }, 200);
+    });
 
-    function initializeMap() {
-      if (mapInstance) return;
-      // center default at Jakarta (can change)
-      mapInstance = L.map('map').setView([-6.200000,106.816666], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
+    function initMap(){
+      map = L.map('map', { zoomControl:true }).setView([-6.2, 106.8], 12);
+      tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapInstance);
+      }).addTo(map);
 
-      // click to add/move marker
-      mapInstance.on('click', function(e){
-        placeTempMarker(e.latlng);
+      map.on('click', function(e){
+        placePickerMarker(e.latlng);
       });
 
-      // buttons
-      document.getElementById('use-current-pos').addEventListener('click', useCurrentPosition);
-      document.getElementById('save-map-pos').addEventListener('click', saveMapPosition);
+      document.getElementById('btnUseMyLoc').addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          alert('Geolocation tidak didukung di browser ini.');
+          return;
+        }
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const latlng = [pos.coords.latitude, pos.coords.longitude];
+          map.setView(latlng, 15);
+          placePickerMarker(L.latLng(latlng));
+        }, (err) => {
+          alert('Gagal mendapatkan lokasi: ' + err.message);
+        }, { enableHighAccuracy:true });
+      });
+
+      // Search on Enter with Nominatim
+      document.getElementById('map_search').addEventListener('keydown', function(e){
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const q = this.value.trim();
+          if (!q) return;
+          nominatimSearch(q).then(results => {
+            if (!results.length) { alert('Alamat tidak ditemukan'); return; }
+            const r = results[0];
+            const latlng = L.latLng(r.lat, r.lon);
+            map.setView(latlng, 16);
+            placePickerMarker(latlng);
+          }).catch(() => alert('Gagal mencari alamat'));
+        }
+      });
+
+      document.getElementById('confirmLocationBtn').addEventListener('click', () => {
+        if (!pickerState.latlng) { alert('Silakan pilih lokasi terlebih dahulu.'); return; }
+        // Reverse geocode to get display name
+        reverseGeocode(pickerState.latlng.lat, pickerState.latlng.lng)
+          .then(addr => {
+            applyPickedLocation(addr);
+            const modal = bootstrap.Modal.getInstance(mapModalEl);
+            modal.hide();
+          })
+          .catch(() => {
+            applyPickedLocation(null);
+            const modal = bootstrap.Modal.getInstance(mapModalEl);
+            modal.hide();
+          });
+      });
     }
 
-    function placeTempMarker(latlng){
-      if(tempMarker) mapInstance.removeLayer(tempMarker);
-      tempMarker = L.marker(latlng, {draggable:true}).addTo(mapInstance);
-      tempMarker.on('dragend', function(){ /* nothing extra, keep new coords */ });
+    function placePickerMarker(latlng){
+      if (!map) return;
+      if (pickerState.marker) map.removeLayer(pickerState.marker);
+      pickerState.marker = L.marker(latlng, { draggable:true }).addTo(map);
+      pickerState.latlng = latlng;
+      pickerState.marker.on('dragend', function(e){
+        pickerState.latlng = e.target.getLatLng();
+      });
     }
 
-    async function useCurrentPosition(){
-      if(!navigator.geolocation){
-        alert('Geolocation tidak didukung oleh browser Anda.');
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(function(pos){
-        const latlng = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-        mapInstance.setView(latlng, 16);
-        placeTempMarker(latlng);
-      }, function(err){
-        alert('Tidak dapat mendapatkan lokasi: ' + err.message);
-      }, {enableHighAccuracy:true, timeout:10000});
-    }
-
-    function saveMapPosition(){
-      if(!currentTargetInputId){
-        alert('Tidak ada field yang dipilih untuk diset.');
-        return;
-      }
-      if(!tempMarker){
-        alert('Silakan pilih titik di peta (klik) atau gunakan lokasi saat ini.');
-        return;
-      }
-      const latlng = tempMarker.getLatLng();
-      // store
-      positionStore[currentTargetInputId] = {lat: latlng.lat, lng: latlng.lng};
-      // make OSM url
-      const url = `https://www.openstreetmap.org/?mlat=${latlng.lat.toFixed(6)}&mlon=${latlng.lng.toFixed(6)}#map=18/${latlng.lat.toFixed(6)}/${latlng.lng.toFixed(6)}`;
-      // set input value to clickable url (we store as text; admin can click)
-      const inputEl = document.getElementById(currentTargetInputId);
-      if(inputEl){
-        inputEl.value = url;
-      }
-      // hide modal
-      const modal = bootstrap.Modal.getInstance(mapModalEl);
-      modal.hide();
-
-      // after setting, try compute estimations
-      computeEstimationsForRelevantForms();
-    }
-
-    // open map setter for a particular input id
-    function openMapSetter(inputId){
-      currentTargetInputId = inputId;
-      // center map on existing pos if available
-      const pos = positionStore[inputId];
+    // Open map picker for a context (antar/kirim/rumah/kebun/ban) and role (pickup/drop)
+    function openMapPicker(context, role) {
+      pickerState.context = context;
+      pickerState.role = role;
+      pickerState.latlng = null;
       const modal = new bootstrap.Modal(mapModalEl);
       modal.show();
-      // ensure map is ready (small timeout helps when first opened)
       setTimeout(() => {
-        if(mapInstance){
-          if(pos) mapInstance.setView([pos.lat,pos.lng], 16);
-          else mapInstance.setView([-6.200000,106.816666], 13);
-          // if there was a previously stored marker for this input, place it
-          if(pos){
-            placeTempMarker(pos);
-          } else {
-            if(tempMarker){ mapInstance.removeLayer(tempMarker); tempMarker = null; }
-          }
-        }
-      }, 200);
+        document.getElementById('map_search').value = '';
+      }, 100);
     }
 
-    // ---------- Distance & Tarif calculation ----------
-    // haversine formula returns km
-    function haversineKm(lat1, lon1, lat2, lon2){
-      const R = 6371; // Earth's radius in km
-      const toRad = d => d * Math.PI / 180;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
+    // Apply picked location to the correct form field
+    function applyPickedLocation(addressObj) {
+      const ctx = pickerState.context;
+      const role = pickerState.role;
+      const latlng = pickerState.latlng;
+      const lat = latlng.lat.toFixed(6);
+      const lng = latlng.lng.toFixed(6);
+      const gmapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      const displayName = addressObj ? addressObj.display_name : `Lat ${lat}, Lng ${lng}`;
+      // assign to appropriate fields
+      if (ctx === 'antar') {
+        if (role === 'pickup') {
+          document.getElementById('antar_jemput_txt').value = displayName;
+          document.getElementById('antar_jemput_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+          document.getElementById('antar_jemput_url').dataset.lat = lat; document.getElementById('antar_jemput_url').dataset.lng = lng;
+        } else {
+          document.getElementById('antar_tujuan_txt').value = displayName;
+          document.getElementById('antar_tujuan_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+          document.getElementById('antar_tujuan_url').dataset.lat = lat; document.getElementById('antar_tujuan_url').dataset.lng = lng;
+        }
+        updateAntarDistanceAndFare();
+      } else if (ctx === 'kirim') {
+        if (role === 'pickup') {
+          document.getElementById('kirim_jemput_txt').value = displayName;
+          document.getElementById('kirim_jemput_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+          document.getElementById('kirim_jemput_url').dataset.lat = lat; document.getElementById('kirim_jemput_url').dataset.lng = lng;
+        } else {
+          document.getElementById('kirim_tujuan_txt').value = displayName;
+          document.getElementById('kirim_tujuan_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+          document.getElementById('kirim_tujuan_url').dataset.lat = lat; document.getElementById('kirim_tujuan_url').dataset.lng = lng;
+        }
+        updateKirimDistanceAndFare();
+      } else if (ctx === 'rumah') {
+        document.getElementById('rumah_lokasi_txt').value = displayName;
+        document.getElementById('rumah_lokasi_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+        document.getElementById('rumah_lokasi_url').dataset.lat = lat; document.getElementById('rumah_lokasi_url').dataset.lng = lng;
+      } else if (ctx === 'kebun') {
+        document.getElementById('kebun_lokasi_txt').value = displayName;
+        document.getElementById('kebun_lokasi_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+        document.getElementById('kebun_lokasi_url').dataset.lat = lat; document.getElementById('kebun_lokasi_url').dataset.lng = lng;
+      } else if (ctx === 'ban') {
+        document.getElementById('ban_lokasi_txt').value = displayName;
+        document.getElementById('ban_lokasi_url').innerHTML = `<a href="${gmapUrl}" target="_blank">${gmapUrl}</a>`;
+        document.getElementById('ban_lokasi_url').dataset.lat = lat; document.getElementById('ban_lokasi_url').dataset.lng = lng;
+      }
+      // reset pickerState latlng for next time
+      pickerState.latlng = null;
+      if (pickerState.marker) { map.removeLayer(pickerState.marker); pickerState.marker = null; }
+    }
+
+    // Nominatim search
+    async function nominatimSearch(q) {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'id' }});
+      return await res.json();
+    }
+
+    // Reverse geocode
+    async function reverseGeocode(lat, lon) {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+      const res = await fetch(url);
+      return await res.json();
+    }
+
+    // Haversine distance (km)
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const toRad = v => v * Math.PI/180;
+      const R = 6371;
+      const dLat = toRad(lat2-lat1);
+      const dLon = toRad(lon2-lon1);
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return R * c;
     }
 
-    // Tarif rules: 6000 IDR / km. Rounding: to nearest 1000 with threshold 500:
-    // remainder < 500 -> round down to lower 1000; remainder >= 500 -> round up to next 1000.
-    function calcTarifFromKm(km){
-      const perKm = 6000;
-      const raw = Math.round(km * perKm); // raw in IDR
-      const remainder = raw % 1000;
-      let base = raw - remainder;
-      if(remainder >= 500) base += 1000;
-      // ensure minimum maybe? (not specified) so return base
-      return base;
+    // Fare calculation and rounding rule
+    function computeFare(distanceKm) {
+      const base = distanceKm * 6000;
+      // Round to nearest 1000 with rule: remainder < 500 -> down, else up
+      const remainder = Math.round(base) % 1000;
+      let fare = Math.round(base);
+      if (remainder < 500) fare = fare - remainder;
+      else fare = fare + (1000 - remainder);
+      if (fare < 1000) fare = 1000; // minimal fare guard
+      return fare;
     }
 
-    // compute estimations for antar & kirim when positions available
-    function computeEstimationsForRelevantForms(){
-      // ANTAR: need antar_jemput and antar_tujuan OR if antar_tujuan typed as URL, we don't have coords -> only compute if both coords exist in positionStore
-      if(positionStore['antar_jemput'] && positionStore['antar_tujuan']){
-        const a = positionStore['antar_jemput'];
-        const b = positionStore['antar_tujuan'];
-        const dist = haversineKm(a.lat, a.lng, b.lat, b.lng);
-        const tarif = calcTarifFromKm(dist);
-        document.getElementById('antar_estimasi').value = dist.toFixed(2) + ' km';
-        document.getElementById('antar_tarif').value = 'Rp ' + tarif.toLocaleString('id-ID');
+    // Update Antar distance & fare when both locations set
+    function updateAntarDistanceAndFare(){
+      const pickup = document.getElementById('antar_jemput_url').dataset;
+      const drop = document.getElementById('antar_tujuan_url').dataset;
+      const distEl = document.getElementById('antar_distance');
+      const fareEl = document.getElementById('antar_fare_display');
+      if (pickup && pickup.lat && drop && drop.lat) {
+        const lat1 = parseFloat(pickup.lat), lon1 = parseFloat(pickup.lng);
+        const lat2 = parseFloat(drop.lat), lon2 = parseFloat(drop.lng);
+        const km = haversineKm(lat1, lon1, lat2, lon2);
+        const kmRounded = (Math.round(km*100)/100);
+        const fare = computeFare(km);
+        distEl.textContent = kmRounded.toLocaleString('id') ;
+        fareEl.textContent = 'Rp ' + fare.toLocaleString('id');
+        document.getElementById('antar_distance').dataset.km = kmRounded;
+        document.getElementById('antar_fare_display').dataset.fare = fare;
       } else {
-        // clear if not ready
-        if(!positionStore['antar_jemput'] || !positionStore['antar_tujuan']){
-          document.getElementById('antar_estimasi').value = '';
-          document.getElementById('antar_tarif').value = '';
-        }
-      }
-
-      // KIRIM: need kirim_pengirim & kirim_penerima coords
-      if(positionStore['kirim_pengirim'] && positionStore['kirim_penerima']){
-        const a = positionStore['kirim_pengirim'];
-        const b = positionStore['kirim_penerima'];
-        const dist = haversineKm(a.lat, a.lng, b.lat, b.lng);
-        const tarif = calcTarifFromKm(dist);
-        document.getElementById('kirim_estimasi').value = dist.toFixed(2) + ' km';
-        document.getElementById('kirim_tarif').value = 'Rp ' + tarif.toLocaleString('id-ID');
-      } else {
-        if(!positionStore['kirim_pengirim'] || !positionStore['kirim_penerima']){
-          document.getElementById('kirim_estimasi').value = '';
-          document.getElementById('kirim_tarif').value = '';
-        }
+        distEl.textContent = '-';
+        fareEl.textContent = '-';
       }
     }
 
-    // also allow user to type a "destination url" manually and admin to click; but automatic tarif only available when both coords set via map
-    // Optionally if user types a textual address into antar_tujuan or kirim_penerima, there is no coord for distance calc.
+    function updateKirimDistanceAndFare(){
+      const pickup = document.getElementById('kirim_jemput_url').dataset;
+      const drop = document.getElementById('kirim_tujuan_url').dataset;
+      const distEl = document.getElementById('kirim_distance');
+      const fareEl = document.getElementById('kirim_fare_display');
+      if (pickup && pickup.lat && drop && drop.lat) {
+        const lat1 = parseFloat(pickup.lat), lon1 = parseFloat(pickup.lng);
+        const lat2 = parseFloat(drop.lat), lon2 = parseFloat(drop.lng);
+        const km = haversineKm(lat1, lon1, lat2, lon2);
+        const kmRounded = (Math.round(km*100)/100);
+        const fare = computeFare(km);
+        distEl.textContent = kmRounded.toLocaleString('id');
+        fareEl.textContent = 'Rp ' + fare.toLocaleString('id');
+        document.getElementById('kirim_distance').dataset.km = kmRounded;
+        document.getElementById('kirim_fare_display').dataset.fare = fare;
+      } else {
+        distEl.textContent = '-';
+        fareEl.textContent = '-';
+      }
+    }
 
-    // ---------- WhatsApp sending ----------
-    function sendOrder(type){
-      let text = '';
-      if(type === 'antar'){
-        const nama = document.getElementById('antar_nama').value || '-';
-        const jemput = document.getElementById('antar_jemput').value || '-';
-        const tujuan = document.getElementById('antar_tujuan').value || '-';
-        const estim = document.getElementById('antar_estimasi').value || '-';
-        const tarif = document.getElementById('antar_tarif').value || '-';
-        text = `Pesanan Antar%0AName: ${encodeURIComponent(nama)}%0ALokasi Jemput: ${encodeURIComponent(jemput)}%0ALokasi Tujuan: ${encodeURIComponent(tujuan)}%0AEstimasi: ${encodeURIComponent(estim)}%0ATarif: ${encodeURIComponent(tarif)}`;
-      } else if(type === 'kirim'){
-        const nama = document.getElementById('kirim_nama').value || '-';
-        const pengirim = document.getElementById('kirim_pengirim').value || '-';
-        const penerima = document.getElementById('kirim_penerima').value || '-';
-        const estim = document.getElementById('kirim_estimasi').value || '-';
-        const tarif = document.getElementById('kirim_tarif').value || '-';
-        text = `Pesanan Kirim Paket%0AName: ${encodeURIComponent(nama)}%0ALokasi Pengirim: ${encodeURIComponent(pengirim)}%0ALokasi Penerima: ${encodeURIComponent(penerima)}%0AEstimasi: ${encodeURIComponent(estim)}%0ATarif: ${encodeURIComponent(tarif)}`;
-      } else if(type === 'rumah'){
-        const nama = document.getElementById('rumah_nama').value || '-';
+    // Send Antar via WhatsApp
+    function sendAntarWhatsApp(){
+      const name = document.getElementById('antar_nama').value || '-';
+      const pickupUrl = document.querySelector('#antar_jemput_url a') ? document.querySelector('#antar_jemput_url a').href : '-';
+      const dropUrl = document.querySelector('#antar_tujuan_url a') ? document.querySelector('#antar_tujuan_url a').href : '-';
+      const km = document.getElementById('antar_distance').dataset.km || '-';
+      const fare = document.getElementById('antar_fare_display').dataset.fare || '-';
+      if (pickupUrl === '-' || dropUrl === '-') return alert('Silakan set lokasi jemput dan tujuan terlebih dahulu.');
+      const text = `Pesanan Antar Jemput%0ANama: ${encodeURIComponent(name)}%0AJemput: ${encodeURIComponent(pickupUrl)}%0ATujuan: ${encodeURIComponent(dropUrl)}%0AJarak: ${km} km%0ATarif: Rp ${fare}%0A`;
+      const wa = `https://wa.me/${ADMIN_WA}?text=${text}`;
+      window.open(wa, '_blank');
+    }
+
+    // Send Kirim via WhatsApp
+    function sendKirimWhatsApp(){
+      const name = document.getElementById('kirim_nama').value || '-';
+      const pickupUrl = document.querySelector('#kirim_jemput_url a') ? document.querySelector('#kirim_jemput_url a').href : '-';
+      const dropUrl = document.querySelector('#kirim_tujuan_url a') ? document.querySelector('#kirim_tujuan_url a').href : '-';
+      const km = document.getElementById('kirim_distance').dataset.km || '-';
+      const fare = document.getElementById('kirim_fare_display').dataset.fare || '-';
+      const desc = document.getElementById('kirim_desc').value || '-';
+      if (pickupUrl === '-' || dropUrl === '-') return alert('Silakan set lokasi jemput dan tujuan terlebih dahulu.');
+      const text = `Pesanan Kirim Paket%0ANama: ${encodeURIComponent(name)}%0AJemput: ${encodeURIComponent(pickupUrl)}%0ATujuan: ${encodeURIComponent(dropUrl)}%0ADeskripsi: ${encodeURIComponent(desc)}%0AJarak: ${km} km%0ATarif: Rp ${fare}%0A`;
+      const wa = `https://wa.me/${ADMIN_WA}?text=${text}`;
+      window.open(wa, '_blank');
+    }
+
+    // General services: rumah/kebun/ban
+    function sendGeneralWhatsApp(type){
+      if (type === 'rumah') {
+        const name = document.getElementById('rumah_nama').value || '-';
         const alamat = document.getElementById('rumah_alamat').value || '-';
-        const lokasi = document.getElementById('rumah_lokasi').value || '-';
+        const loc = document.querySelector('#rumah_lokasi_url a') ? document.querySelector('#rumah_lokasi_url a').href : '-';
         const kebutuhan = document.getElementById('rumah_kebutuhan').value || '-';
         const pertanyaan = document.getElementById('rumah_pertanyaan').value || '-';
-        text = `Pesanan Bersihin Rumah%0AName: ${encodeURIComponent(nama)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(lokasi)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}`;
-      } else if(type === 'kebun'){
-        const nama = document.getElementById('kebun_nama').value || '-';
+        const text = `Pesanan Bersihin Rumah%0ANama: ${encodeURIComponent(name)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(loc)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}%0A`;
+        window.open(`https://wa.me/${ADMIN_WA}?text=${text}`,'_blank');
+      } else if (type === 'kebun') {
+        const name = document.getElementById('kebun_nama').value || '-';
         const alamat = document.getElementById('kebun_alamat').value || '-';
-        const lokasi = document.getElementById('kebun_lokasi').value || '-';
+        const loc = document.querySelector('#kebun_lokasi_url a') ? document.querySelector('#kebun_lokasi_url a').href : '-';
         const kebutuhan = document.getElementById('kebun_kebutuhan').value || '-';
         const pertanyaan = document.getElementById('kebun_pertanyaan').value || '-';
-        text = `Pesanan Bersihin Kebun%0AName: ${encodeURIComponent(nama)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(lokasi)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}`;
-      } else if(type === 'ban'){
-        const nama = document.getElementById('ban_nama').value || '-';
+        const text = `Pesanan Bersihin Kebun%0ANama: ${encodeURIComponent(name)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(loc)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}%0A`;
+        window.open(`https://wa.me/${ADMIN_WA}?text=${text}`,'_blank');
+      } else if (type === 'ban') {
+        const name = document.getElementById('ban_nama').value || '-';
         const alamat = document.getElementById('ban_alamat').value || '-';
-        const lokasi = document.getElementById('ban_lokasi').value || '-';
+        const loc = document.querySelector('#ban_lokasi_url a') ? document.querySelector('#ban_lokasi_url a').href : '-';
         const kebutuhan = document.getElementById('ban_kebutuhan').value || '-';
         const pertanyaan = document.getElementById('ban_pertanyaan').value || '-';
-        text = `Pesanan Tempel Ban%0AName: ${encodeURIComponent(nama)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(lokasi)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}`;
-      } else {
-        alert('Tipe pesanan tidak dikenal.');
-        return;
+        const text = `Pesanan Tempel Ban%0ANama: ${encodeURIComponent(name)}%0AAlamat: ${encodeURIComponent(alamat)}%0ALokasi: ${encodeURIComponent(loc)}%0AKebutuhan: ${encodeURIComponent(kebutuhan)}%0APertanyaan: ${encodeURIComponent(pertanyaan)}%0A`;
+        window.open(`https://wa.me/${ADMIN_WA}?text=${text}`,'_blank');
       }
-
-      // create wa.me link
-      const url = `https://wa.me/${ADMIN_WA}?text=${text}`;
-      window.open(url, '_blank');
     }
 
-    // OPTIONAL: if user types a URL into antar_tujuan or kirim_penerima and later sets the other point with map, admin can still click URL.
-    // The distance/tarif will appear only when both endpoints have coords set via the map (positionStore).
-
-    // For convenience: when user manually pastes an OSM link into an input, try to parse coords (very basic)
-    function tryParseOSMUrlToCoords(text){
-      if(!text) return null;
-      try{
-        // match patterns like "#map=18/lat/lon" or "?mlat=...&mlon=..."
-        const hashIdx = text.indexOf('#map=');
-        if(hashIdx !== -1){
-          const after = text.substring(hashIdx + 5); // after '#map='
-          const parts = after.split('/');
-          if(parts.length >= 3){
-            const lat = parseFloat(parts[1]);
-            const lon = parseFloat(parts[2]);
-            if(!isNaN(lat) && !isNaN(lon)) return {lat, lng: lon};
-          }
-        }
-        // try mlat/mlon
-        const mlat = (text.match(/mlat=([-0-9.]+)/) || [])[1];
-        const mlon = (text.match(/mlon=([-0-9.]+)/) || [])[1];
-        if(mlat && mlon){
-          const lat = parseFloat(mlat), lng = parseFloat(mlon);
-          if(!isNaN(lat) && !isNaN(lng)) return {lat, lng};
-        }
-      } catch(e){}
-      return null;
-    }
-
-    // Watch for manual paste into fields and attempt parse
-    document.getElementById('antar_tujuan').addEventListener('change', function(){
-      const coords = tryParseOSMUrlToCoords(this.value);
-      if(coords){
-        positionStore['antar_tujuan'] = coords;
-        computeEstimationsForRelevantForms();
-      }
-    });
-    document.getElementById('kirim_penerima').addEventListener('change', function(){
-      const coords = tryParseOSMUrlToCoords(this.value);
-      if(coords){
-        positionStore['kirim_penerima'] = coords;
-        computeEstimationsForRelevantForms();
+    // Allow typing destination in antar and kirim forms (search & pick first result)
+    document.getElementById('antar_tujuan_search').addEventListener('keydown', async function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = this.value.trim(); if (!q) return;
+        const r = await nominatimSearch(q);
+        if (!r.length) { alert('Alamat tidak ditemukan'); return; }
+        const first = r[0];
+        // apply to antar_tujuan
+        const lat = parseFloat(first.lat).toFixed(6), lon = parseFloat(first.lon).toFixed(6);
+        document.getElementById('antar_tujuan_txt').value = first.display_name;
+        const gmap = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        document.getElementById('antar_tujuan_url').innerHTML = `<a href="${gmap}" target="_blank">${gmap}</a>`;
+        document.getElementById('antar_tujuan_url').dataset.lat = lat;
+        document.getElementById('antar_tujuan_url').dataset.lng = lon;
+        updateAntarDistanceAndFare();
       }
     });
 
-    // Also parse when admin sets jemput/pengirim by using map setter (already stores coords).
-    // When modal is hidden we reset tempMarker to avoid confusion
-    mapModalEl.addEventListener('hidden.bs.modal', function(){
-      // Keep positionStore (we want to keep values)
-      if(tempMarker && mapInstance){
-        mapInstance.removeLayer(tempMarker);
-        tempMarker = null;
+    document.getElementById('kirim_tujuan_search').addEventListener('keydown', async function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = this.value.trim(); if (!q) return;
+        const r = await nominatimSearch(q);
+        if (!r.length) { alert('Alamat tidak ditemukan'); return; }
+        const first = r[0];
+        const lat = parseFloat(first.lat).toFixed(6), lon = parseFloat(first.lon).toFixed(6);
+        document.getElementById('kirim_tujuan_txt').value = first.display_name;
+        const gmap = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        document.getElementById('kirim_tujuan_url').innerHTML = `<a href="${gmap}" target="_blank">${gmap}</a>`;
+        document.getElementById('kirim_tujuan_url').dataset.lat = lat;
+        document.getElementById('kirim_tujuan_url').dataset.lng = lon;
+        updateKirimDistanceAndFare();
       }
-      currentTargetInputId = null;
     });
 
-    // Optional helper: if user clicks on an input containing a URL, open it in new tab
-    ['antar_jemput','antar_tujuan','kirim_pengirim','kirim_penerima','rumah_lokasi','kebun_lokasi','ban_lokasi'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.addEventListener('click', function(){
-        const v = el.value || '';
-        // if it's an OSM url, open
-        if(v.startsWith('http')){
-          window.open(v, '_blank');
-        }
-      });
-    });
+    // Helper small UI functions
+    function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
+    function showProfile(){ alert('Profil: Fitur profil belum diimplementasikan. Hubungi admin via WA.'); }
 
-    // END SCRIPT
+    // Initialize: optional center to user's location on load (not required)
+    (function tryCenterToUser(){
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          // If map exists, set view
+          if (map) map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+        }, ()=>{}, {timeout:3000});
+      }
+    })();
+
   </script>
 </body>
 </html>
