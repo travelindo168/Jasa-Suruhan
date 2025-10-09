@@ -1,479 +1,796 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Siap Antar, Siap Jemput & Siap Suruh</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <title>Siap Suruh - Layanan Jasa</title>
 
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Leaflet-Geosearch (bundle) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.8.0/dist/geosearch.css"/>
-<script src="https://unpkg.com/leaflet-geosearch@3.8.0/dist/bundle.min.js"></script>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-<style>
-  :root { --accent:#ff7f00; --green:#28a745; --bg:#f8f9fb; }
-  body { margin:0; font-family: "Segoe UI", Roboto, "Poppins", sans-serif; background:var(--bg); color:#222; }
-  header { background:var(--green); color:#fff; padding:12px 16px; font-weight:700; display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid var(--accent); }
-  header h1 { margin:0; font-size:16px; }
-  .container { max-width:520px; margin:16px auto; background:#fff; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
-  .banner img { width:100%; border-radius:10px; display:block; margin-bottom:12px; }
-  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
-  .item { background:#fff; border-radius:12px; padding:10px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.06); cursor:pointer; }
-  .item img { width:46px; height:46px; }
-  label{ display:block; font-weight:600; margin-top:8px; font-size:13px; }
-  input, select, textarea, button { width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; box-sizing:border-box; margin-top:6px; }
-  textarea { min-height:70px; resize:vertical; }
-  .row { display:flex; gap:8px; }
-  .btn { border:none; color:#fff; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; }
-  .btn-primary { background:#007bff; }
-  .btn-danger { background:#dc3545; }
-  .btn-success { background:var(--green); }
-  .muted { color:#666; font-size:13px; margin-top:6px; }
-
-  /* modal map */
-  .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1100; justify-content:center; align-items:center; }
-  .modal-open .modal-backdrop { display:flex; }
-  .modal-card { width:95%; max-width:900px; max-height:92vh; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.3); display:flex; flex-direction:column; }
-  .modal-header { padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; }
-  .modal-title { margin:0; font-weight:700; }
-  .modal-body { padding:10px; display:flex; flex-direction:column; gap:8px; }
-  #map { height:420px; border-radius:8px; }
-  .map-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .map-controls input { flex:1; min-width:160px; }
-  .small { width:auto; display:inline-block; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; border:none; color:#fff; }
-  .small.btn-gray { background:#6c757d; }
-
-  .info-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:6px; }
-  .info { background:#f1f1f1; padding:8px 10px; border-radius:8px; font-size:14px; }
-
-  .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:90px; background:#333; color:#fff; padding:10px 14px; border-radius:20px; display:none; z-index:1200; }
-  .toast.show { display:block; }
-
-  footer { height:78px; } /* space for bottom nav if needed */
-  @media (max-width:520px){ #map{height:360px;} }
-</style>
+  <!-- Leaflet for maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* warna dasar: hijau, oranye, putih */
+    :root{
+      --brand-green: #29a74a;
+      --brand-orange: #ff8a00;
+      --brand-white: #ffffff;
+    }
+    body {
+      background: linear-gradient(180deg, var(--brand-white) 0%, #f6fff6 100%);
+      min-height:100vh;
+      padding-bottom:80px; /* for bottom nav */
+    }
+    .top-banner{
+      background: linear-gradient(90deg, var(--brand-green), var(--brand-orange));
+      color: white;
+      padding: 16px 12px;
+      border-radius: 0 0 16px 16px;
+      margin-bottom: 12px;
+    }
+    .card-service{
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .12s;
+    }
+    .card-service:hover{ transform: translateY(-4px); }
+    .service-icon{
+      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;
+      color:white;
+    }
+    .map-container{ height:320px; width:100%; border-radius:8px; overflow:hidden; }
+    .bottom-nav{
+      position: fixed; left:0; right:0; bottom:0; height:66px; background: white;
+      border-top:1px solid #e6e6e6; display:flex; align-items:center; justify-content:space-around; padding-bottom:6px;
+    }
+    .bottom-nav .btn { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:12px;}
+    .small-note{ font-size:12px; color:#666; }
+    /* modal full-screen on mobile */
+    @media (max-width:576px){
+      .modal-dialog { max-width:100%; margin:0; height:100%; display:flex; align-items:flex-end; }
+      .modal-content { border-radius: 16px 16px 0 0; height:92vh; overflow:auto; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>Siap Antar, Siap Jemput & Siap Suruh</h1>
-</header>
-
-<div class="container">
-  <div class="banner">
-    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhRChNVFEnMamg4xeg_J9Fkr_3I93wxxk4o6XlG1z8FMwSPS0mlpsb2yPdXa3zdSM5edvwKiUfp36e8LbDary6mH6uUOTVCSsaT5beEW9Qly3xn7CIaToNsZa63wsUHP5q9hjmrG-QhLHN066qercKNZu2ATqe__2R87rdTm4EiWR19DcsFuIddMjyY0bI/s1536/IMG_20251005_083246.png" alt="banner">
-  </div>
-
-  <div class="grid" style="margin-bottom:12px;">
-    <div class="item" onclick="bukaForm('Antar Jemput')"><img src="https://cdn-icons-png.flaticon.com/512/1995/1995470.png" alt=""><div>Antar Jemput</div></div>
-    <div class="item" onclick="bukaForm('Kirim Paket')"><img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" alt=""><div>Kirim Paket</div></div>
-    <div class="item" onclick="bukaForm('Bersih Rumah')"><img src="https://cdn-icons-png.flaticon.com/512/883/883407.png" alt=""><div>Bersih Rumah</div></div>
-    <div class="item" onclick="bukaForm('Bersihin Kebun')"><img src="https://cdn-icons-png.flaticon.com/512/482/482988.png" alt=""><div>Bersihin Kebun</div></div>
-    <div class="item" onclick="bukaForm('Tambal Ban')"><img src="https://cdn-icons-png.flaticon.com/512/3430/3430871.png" alt=""><div>Tambal Ban</div></div>
-    <div class="item" onclick="bukaForm('Tukang')"><img src="https://cdn-icons-png.flaticon.com/512/272/272075.png" alt=""><div>Tukang</div></div>
-    <div class="item" onclick="bukaForm('Jaga Rumah')"><img src="https://cdn-icons-png.flaticon.com/512/484/484582.png" alt=""><div>Jaga Rumah</div></div>
-  </div>
-
-  <!-- MAIN POPUP FORM -->
-  <div id="popupForm" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="width:94%; max-width:520px; background:#fff; border-radius:10px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,0.25); max-height:92vh; overflow:auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 id="judulForm" style="margin:0;">Form Pesanan</h3>
-        <button onclick="tutupForm()" style="background:none;border:none;font-size:22px;cursor:pointer;">&times;</button>
+  <div class="container py-3">
+    <!-- Banner -->
+    <div class="top-banner d-flex align-items-center justify-content-between">
+      <div>
+        <h5 class="mb-0">SIAP SURUH, SIAP ANTAR</h5>
+        <div class="small-note">Layanan antar, kirim paket & jasa lainnya</div>
       </div>
-
-      <label>Nama Lengkap</label>
-      <input id="nama" placeholder="Nama lengkap">
-
-      <label>Alamat singkat (opsional)</label>
-      <input id="alamatDetail" placeholder="Contoh: Depan rumah, gang kecil">
-
-      <label>Lokasi Jemput (ambil dari GPS atau pilih di peta)</label>
-      <div style="display:flex; gap:8px; margin-bottom:6px;">
-        <button class="small btn-success" onclick="setJemputFromGPS()">Gunakan Lokasi Saya</button>
-        <button class="small btn-gray" onclick="bukaMapModal('jemput')">Tentukan di Peta</button>
+      <div class="text-end">
+        <img src="data:image/svg+xml;utf8,
+          <svg xmlns='http://www.w3.org/2000/svg' width='56' height='56'>
+            <rect rx='12' width='56' height='56' fill='%23ffffff' opacity='0.18'/>
+            <text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' 
+              fill='white' font-size='26' font-family='Arial' font-weight='700'>SS</text>
+          </svg>" alt="logo" style="width:56px;height:56px;border-radius:12px;">
       </div>
-      <input id="lokasiJemput" readonly placeholder="Link lokasi jemput (otomatis terisi)">
+    </div>
 
-      <div id="tujuanGroup" style="display:none;">
-        <label>Lokasi Tujuan</label>
-        <div style="display:flex; gap:8px; margin-bottom:6px;">
-          <input id="lokasiTujuan" readonly placeholder="Hasil pencarian atau klik peta">
-          <button class="small btn-gray" onclick="bukaMapModal('antar')" style="min-width:110px">Buka Peta</button>
+    <!-- Menu Kategori -->
+    <div class="row g-3 mb-3">
+      <!-- Antar Jemput -->
+      <div class="col-6">
+        <div class="card card-service p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAntar" id="btnAntar">
+          <div class="d-flex align-items-center gap-2">
+            <div class="service-icon" style="background:var(--brand-green)"><i class="bi bi-bicycle"></i></div>
+            <div>
+              <div class="fw-bold">Antar Jemput</div>
+              <div class="small-note">Order antar-jemput</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <label>Koordinat Jemput</label>
-      <input id="coordJemput" readonly placeholder="lat,lon">
-
-      <label id="labelCoordAntar" style="display:none;">Koordinat Tujuan</label>
-      <input id="coordAntar" readonly style="display:none;" placeholder="lat,lon">
-
-      <div id="estimasiGroup" style="display:none;">
-        <label>Jarak (km)</label>
-        <input id="jarak" readonly placeholder="-">
-        <label>Estimasi Biaya (Rp 6.000/km)</label>
-        <input id="estimasiBiaya" readonly placeholder="-">
+      <!-- Kirim Paket -->
+      <div class="col-6">
+        <div class="card card-service p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalKirim" id="btnKirim">
+          <div class="d-flex align-items-center gap-2">
+            <div class="service-icon" style="background:var(--brand-orange)"><i class="bi bi-box-seam"></i></div>
+            <div>
+              <div class="fw-bold">Kirim Paket</div>
+              <div class="small-note">Kirim barang</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <label>Pertanyaan Biaya / Harga</label>
-      <textarea id="pertanyaanBiaya" placeholder="Contoh: Berapa biaya per jam?"></textarea>
+      <!-- Bersihin Rumah -->
+      <div class="col-6">
+        <div class="card card-service p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalBersihinRumah">
+          <div class="d-flex align-items-center gap-2">
+            <div class="service-icon" style="background:#2f9a7d"><i class="bi bi-house-fill"></i></div>
+            <div>
+              <div class="fw-bold">Bersihin Rumah</div>
+              <div class="small-note">Cleaning service</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <label>Metode Pembayaran</label>
-      <select id="metodeBayar">
-        <option value="CASH DRIVER">CASH DRIVER</option>
-        <option value="TRANSFER">TRANSFER</option>
-        <option value="QRIS">QRIS</option>
-      </select>
+      <!-- Bersihin Kebun -->
+      <div class="col-6">
+        <div class="card card-service p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalBersihinKebun">
+          <div class="d-flex align-items-center gap-2">
+            <div class="service-icon" style="background:#3fb17f"><i class="bi bi-tree-fill"></i></div>
+            <div>
+              <div class="fw-bold">Bersihin Kebun</div>
+              <div class="small-note">Perawatan kebun</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <label>Catatan Tambahan</label>
-      <textarea id="catatan" placeholder="Catatan (opsional)"></textarea>
+      <!-- Tempel Ban -->
+      <div class="col-6">
+        <div class="card card-service p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTempelBan">
+          <div class="d-flex align-items-center gap-2">
+            <div class="service-icon" style="background:#57b05a"><i class="bi bi-tools"></i></div>
+            <div>
+              <div class="fw-bold">Tempel Ban</div>
+              <div class="small-note">Tambal ban & layanan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button class="btn btn-primary" onclick="kirimPesanan()">Kirim Pesanan</button>
-        <button class="btn btn-danger" onclick="tutupForm()">Batal</button>
+    <!-- Info kecil -->
+    <div class="text-center small text-muted mb-4">
+      Tarif dasar: <strong>6.000 / KM</strong>. Pembulatan ke ribuan (>=500 dibulatkan ke atas).
+    </div>
+
+  </div>
+
+  <!-- MODAL: Antar Jemput -->
+  <div class="modal fade" id="modalAntar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Form Antar Jemput</h5>
+          <button class="btn btn-sm btn-light" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+        </div>
+
+        <form id="formAntar">
+          <div class="mb-2">
+            <label class="form-label">Nama</label>
+            <input type="text" class="form-control" id="antar_nama" placeholder="Nama lengkap" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Lokasi Jemputan</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="antar_jemput_text" placeholder="Atur lokasi jemput atau klik Set lokasi" readonly>
+              <button type="button" class="btn btn-outline-secondary" id="btnSetJemput">Set lokasi</button>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Tujuan Antar</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="antar_tujuan_text" placeholder="Atur lokasi tujuan atau ketik alamat" required>
+              <button type="button" class="btn btn-outline-secondary" id="btnSetTujuan">Set lokasi</button>
+            </div>
+            <div class="form-text">Anda bisa mengetik alamat tujuan lalu klik "Cari" atau tekan Set lokasi untuk pilih dari map.</div>
+            <div class="input-group mt-2">
+              <input type="text" id="tujuan_search" class="form-control" placeholder="Ketik alamat tujuan untuk mencari">
+              <button type="button" class="btn btn-primary" id="btnCariTujuan">Cari</button>
+            </div>
+            <div id="tujuan_results" class="mt-2"></div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Estimasi Jarak & Tarif</label>
+            <div class="p-2 border rounded" id="antar_estimasi">
+              <div>Jarak: <span id="est_jarak">-</span> km</div>
+              <div>Tarif kotor: <span id="est_tarif_raw">-</span></div>
+              <div>Tarif setelah pembulatan: <strong id="est_tarif">-</strong></div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-success">Kirim Pesanan via WhatsApp</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- MAP MODAL (SHARED) -->
-  <div id="mapModal" class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">Tentukan Lokasi</div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <select id="mapMode" title="Mode" style="padding:8px; border-radius:8px; border:1px solid #ccc;">
-            <option value="jemput">Set Titik Jemput</option>
-            <option value="antar">Set Titik Tujuan</option>
-          </select>
-          <button class="small btn-success" onclick="setCurrentLocationFromModal()">Gunakan Lokasi Ini</button>
-          <button class="small btn-gray" onclick="tutupMapModal()">Selesai</button>
+  <!-- MODAL: Kirim Paket (mirip antar) -->
+  <div class="modal fade" id="modalKirim" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Form Kirim Paket</h5>
+          <button class="btn btn-sm btn-light" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
         </div>
+
+        <form id="formKirim">
+          <div class="mb-2">
+            <label class="form-label">Nama</label>
+            <input type="text" class="form-control" id="kirim_nama" placeholder="Nama lengkap" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Lokasi Pengambilan</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="kirim_pick_text" placeholder="Atur lokasi pengambilan" readonly>
+              <button type="button" class="btn btn-outline-secondary" id="btnSetPick">Set lokasi</button>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Lokasi Tujuan</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="kirim_drop_text" placeholder="Atur lokasi tujuan atau ketik alamat" required>
+              <button type="button" class="btn btn-outline-secondary" id="btnSetDrop">Set lokasi</button>
+            </div>
+            <div class="input-group mt-2">
+              <input type="text" id="kirim_tujuan_search" class="form-control" placeholder="Ketik alamat tujuan untuk mencari">
+              <button type="button" class="btn btn-primary" id="btnCariKirimTujuan">Cari</button>
+            </div>
+            <div id="kirim_tujuan_results" class="mt-2"></div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Estimasi Jarak & Tarif</label>
+            <div class="p-2 border rounded" id="kirim_estimasi">
+              <div>Jarak: <span id="kirim_jarak">-</span> km</div>
+              <div>Tarif kotor: <span id="kirim_tarif_raw">-</span></div>
+              <div>Tarif setelah pembulatan: <strong id="kirim_tarif">-</strong></div>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Deskripsi Paket (opsional)</label>
+            <textarea id="kirim_desc" class="form-control" rows="2" placeholder="Isi detail paket (jenis, berat, catatan)"></textarea>
+          </div>
+
+          <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">Kirim Pesanan via WhatsApp</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </form>
       </div>
+    </div>
+  </div>
 
-      <div class="modal-body">
-        <div class="map-controls">
-          <input id="searchTujuan" placeholder="Cari lokasi tujuan (tekan Enter)" />
+  <!-- MODAL: Bersihin Rumah -->
+  <div class="modal fade" id="modalBersihinRumah" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Form Bersihin Rumah</h5>
+          <button class="btn btn-sm btn-light" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
         </div>
 
-        <div id="map"></div>
+        <form id="formBersihinRumah">
+          <div class="mb-2"><label class="form-label">Nama</label><input id="br_nama" class="form-control" required></div>
+          <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="br_alamat" class="form-control" required></div>
+          <div class="mb-2">
+            <label class="form-label">Set lokasi (izinkan GPS)</label>
+            <div class="input-group">
+              <input id="br_loc_text" class="form-control" placeholder="Klik set lokasi untuk pakai peta / GPS" readonly>
+              <button type="button" class="btn btn-outline-secondary" id="btnBrSetLoc">Set lokasi</button>
+            </div>
+          </div>
+          <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><input id="br_kebutuhan" class="form-control" placeholder="Contoh: 2 jam bersih, cuci lantai" required></div>
+          <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="br_pertanyaan" class="form-control" rows="2"></textarea></div>
 
-        <div class="info-row">
-          <div class="info"><b>Jemput:</b> <span id="infoJemput">-</span></div>
-          <div class="info"><b>Antar:</b> <span id="infoAntar">-</span></div>
-          <div class="info" id="infoJarakWrap" style="display:none;"><b>Jarak:</b> <span id="infoJarak">-</span> km</div>
-          <div class="info" id="infoBiayaWrap" style="display:none;"><b>Estimasi:</b> <span id="infoBiaya">-</span></div>
+          <div class="d-grid gap-2 mt-3">
+            <button class="btn btn-success" type="submit">Kirim Pesanan via WhatsApp</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Bersihin Kebun -->
+  <div class="modal fade" id="modalBersihinKebun" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Form Bersihin Kebun</h5>
+          <button class="btn btn-sm btn-light" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+        </div>
+
+        <form id="formBersihinKebun">
+          <div class="mb-2"><label class="form-label">Nama</label><input id="bk_nama" class="form-control" required></div>
+          <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="bk_alamat" class="form-control" required></div>
+          <div class="mb-2">
+            <label class="form-label">Set lokasi (GPS)</label>
+            <div class="input-group">
+              <input id="bk_loc_text" class="form-control" readonly>
+              <button type="button" class="btn btn-outline-secondary" id="btnBkSetLoc">Set lokasi</button>
+            </div>
+          </div>
+          <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><input id="bk_kebutuhan" class="form-control" required></div>
+          <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="bk_pertanyaan" class="form-control" rows="2"></textarea></div>
+
+          <div class="d-grid gap-2 mt-3">
+            <button class="btn btn-success" type="submit">Kirim Pesanan via WhatsApp</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Tempel Ban -->
+  <div class="modal fade" id="modalTempelBan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Form Tempel Ban</h5>
+          <button class="btn btn-sm btn-light" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+        </div>
+
+        <form id="formTempelBan">
+          <div class="mb-2"><label class="form-label">Nama</label><input id="tb_nama" class="form-control" required></div>
+          <div class="mb-2"><label class="form-label">Alamat Lengkap</label><input id="tb_alamat" class="form-control" required></div>
+          <div class="mb-2">
+            <label class="form-label">Set lokasi (GPS)</label>
+            <div class="input-group">
+              <input id="tb_loc_text" class="form-control" readonly>
+              <button type="button" class="btn btn-outline-secondary" id="btnTbSetLoc">Set lokasi</button>
+            </div>
+          </div>
+          <div class="mb-2"><label class="form-label">Kebutuhan Jasa</label><input id="tb_kebutuhan" class="form-control" placeholder="Contoh: tambal ban + ganti ban" required></div>
+          <div class="mb-2"><label class="form-label">Pertanyaan Estimasi Biaya</label><textarea id="tb_pertanyaan" class="form-control" rows="2"></textarea></div>
+
+          <div class="d-grid gap-2 mt-3">
+            <button class="btn btn-success" type="submit">Kirim Pesanan via WhatsApp</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MAP PICKER (reusable) -->
+  <div class="modal fade" id="modalMapPicker" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <div class="p-2 d-flex align-items-center justify-content-between">
+          <h6 id="mapPickerTitle" class="mb-0">Pilih Lokasi</h6>
+          <div>
+            <button class="btn btn-sm btn-primary" id="saveMapLocation">Simpan</button>
+            <button class="btn btn-sm btn-light ms-1" data-bs-dismiss="modal">Batal</button>
+          </div>
+        </div>
+        <div class="p-2">
+          <div id="map" class="map-container"></div>
+          <div class="mt-2 small text-muted">Seret marker untuk mengubah lokasi. Klik tombol "Simpan" saat lokasi sudah benar.</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="toast">✅ Pesanan terkirim</div>
-</div>
+  <!-- bottom nav -->
+  <div class="bottom-nav shadow-sm">
+    <button class="btn" id="navHome"><i class="bi bi-house-door-fill fs-4" style="color:var(--brand-green)"></i><div>Home</div></button>
+    <button class="btn" id="navQuestion"><i class="bi bi-chat-left-text fs-4" style="color:var(--brand-orange)"></i><div>Pertanyaan</div></button>
+    <button class="btn" id="navProfile"><i class="bi bi-person-circle fs-4"></i><div>Profil</div></button>
+  </div>
 
-<footer></footer>
+  <!-- Dependencies: Leaflet + Bootstrap JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-/* ---------- Konfigurasi ---------- */
-const ADMIN_WA = "6281262433533"; // nomor admin
-const TARIF_PER_KM = 6000;        // Rp per km
+  <script>
+    // ADMIN WA number (format internasional, tanpa tanda +)
+    const ADMIN_WA = "6281262433533";
 
-/* ---------- State ---------- */
-let layananDipilih = "";
-let map = null;
-let markerJemput = null;
-let markerAntar = null;
-let latJemput = null, lonJemput = null, latAntar = null, lonAntar = null;
-let provider = null;
-
-/* ---------- UI helpers ---------- */
-function showToast(msg = "✅ Pesanan terkirim") {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  t.style.display = 'block';
-  setTimeout(()=>{ t.style.display='none'; }, 2400);
-}
-
-/* ---------- Open/close main form ---------- */
-function bukaForm(layanan) {
-  layananDipilih = layanan;
-  document.getElementById('judulForm').innerText = layanan;
-  document.getElementById('popupForm').style.display = 'flex';
-  // reset fields except name maybe
-  document.getElementById('alamatDetail').value = '';
-  document.getElementById('lokasiJemput').value = '';
-  document.getElementById('lokasiTujuan').value = '';
-  document.getElementById('coordJemput').value = '';
-  document.getElementById('coordAntar').value = '';
-  document.getElementById('jarak').value = '';
-  document.getElementById('estimasiBiaya').value = '';
-  document.getElementById('pertanyaanBiaya').value = '';
-  document.getElementById('catatan').value = '';
-
-  if (layanan === 'Antar Jemput' || layanan === 'Kirim Paket') {
-    document.getElementById('tujuanGroup').style.display = 'block';
-    document.getElementById('labelCoordAntar').style.display = 'block';
-    document.getElementById('coordAntar').style.display = 'block';
-    document.getElementById('estimasiGroup').style.display = 'block';
-  } else {
-    document.getElementById('tujuanGroup').style.display = 'none';
-    document.getElementById('labelCoordAntar').style.display = 'none';
-    document.getElementById('coordAntar').style.display = 'none';
-    document.getElementById('estimasiGroup').style.display = 'none';
-  }
-}
-function tutupForm() { document.getElementById('popupForm').style.display = 'none'; }
-
-/* ---------- Map modal open/close ---------- */
-function bukaMapModal(mode='jemput') {
-  document.body.classList.add('modal-open');
-  document.getElementById('mapModal').style.display = 'flex';
-  if (mode) document.getElementById('mapMode').value = mode;
-  initMapIfNeeded();
-  // small timeout so leaflet can recalc size
-  setTimeout(()=>{ try{ map.invalidateSize(); fitMapToMarkers(); }catch(e){} }, 260);
-}
-function tutupMapModal() {
-  document.body.classList.remove('modal-open');
-  document.getElementById('mapModal').style.display = 'none';
-  // update summary fields
-  updateSummaryFields();
-}
-
-/* ---------- Init map (lazy) ---------- */
-function initMapIfNeeded() {
-  if (map) return;
-  map = L.map('map', { center:[-6.200000,106.816666], zoom:12 });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap contributors' }).addTo(map);
-
-  // create markers (draggable)
-  markerJemput = L.marker([0,0], { draggable:true, icon: greenIcon() });
-  markerAntar = L.marker([0,0], { draggable:true, icon: redIcon() });
-
-  markerJemput.on('dragend', function(e){
-    const p = e.target.getLatLng();
-    latJemput = p.lat; lonJemput = p.lng;
-    setJemputFields(latJemput, lonJemput);
-    updateSummaryFields();
-  });
-  markerAntar.on('dragend', function(e){
-    const p = e.target.getLatLng();
-    latAntar = p.lat; lonAntar = p.lng;
-    setAntarFields(latAntar, lonAntar);
-    updateSummaryFields();
-  });
-
-  // provider for geosearch (OpenStreetMap)
-  try {
-    provider = new window.GeoSearch.OpenStreetMapProvider();
-  } catch(e) { provider = null; console.warn('geosearch not ready', e); }
-
-  // search input: Enter => search tujuan
-  document.getElementById('searchTujuan').addEventListener('keydown', function(ev){
-    if (ev.key === 'Enter') {
-      ev.preventDefault();
-      const q = this.value.trim();
-      if (!q) return alert('Ketik alamat/daerah lalu tekan Enter.');
-      if (!provider) return alert('Fitur pencarian tidak tersedia. Coba lagi nanti.');
-      provider.search({ query: q }).then(res=>{
-        if (!res || res.length===0) return alert('Lokasi tidak ditemukan. Coba kata kunci lain.');
-        const r = res[0]; // pick top result
-        // r.x = lon, r.y = lat
-        placeAntar(r.y, r.x, true);
-        map.setView([r.y, r.x], 15);
-      }).catch(err=>{
-        console.error(err); alert('Gagal mencari alamat. Coba lagi.');
-      });
+    // Helper: Haversine distance (km)
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = (v) => v * Math.PI / 180;
+      const R = 6371; // km
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
     }
-  });
 
-  // click on map places marker according to mode
-  map.on('click', function(e){
-    const mode = document.getElementById('mapMode').value || 'jemput';
-    if (mode === 'jemput') placeJemput(e.latlng.lat, e.latlng.lng, true);
-    else placeAntar(e.latlng.lat, e.latlng.lng, true);
-  });
-}
+    // Tarif calculation
+    function calcFare(distanceKm){
+      // tarif per km 6000
+      const raw = Math.max(0, Math.round(distanceKm * 1000) / 1000 * 6000); // ensure number
+      // But better: raw = distanceKm * 6000
+      const rawExact = distanceKm * 6000;
+      // pembulatan ke ribuan: <500 -> floor, >=500 -> up
+      const rounded = Math.round(rawExact/1000) * 1000;
+      return { raw: Math.round(rawExact), rounded };
+    }
 
-/* ---------- Icon helpers ---------- */
-function greenIcon(){ return L.icon({ iconUrl:'https://cdn-icons-png.flaticon.com/512/190/190411.png', iconSize:[36,36], iconAnchor:[18,36] }); }
-function redIcon(){ return L.icon({ iconUrl:'https://cdn-icons-png.flaticon.com/512/484/484167.png', iconSize:[36,36], iconAnchor:[18,36] }); }
+    // Reusable map picker using Leaflet
+    let map, pickerMarker;
+    let currentPickerCallback = null;
+    let currentPickerTitle = "Pilih Lokasi";
 
-/* ---------- Place / set marker functions ---------- */
-function placeJemput(lat, lon, openPopup=false) {
-  latJemput = lat; lonJemput = lon;
-  markerJemput.setLatLng([lat,lon]);
-  if (!map.hasLayer(markerJemput)) markerJemput.addTo(map);
-  if (openPopup) markerJemput.bindPopup('Titik Jemput').openPopup();
-  setJemputFields(lat, lon);
-  fitMapToMarkers();
-  updateSummaryFields();
-}
-function placeAntar(lat, lon, openPopup=false) {
-  latAntar = lat; lonAntar = lon;
-  markerAntar.setLatLng([lat,lon]);
-  if (!map.hasLayer(markerAntar)) markerAntar.addTo(map);
-  if (openPopup) markerAntar.bindPopup('Titik Tujuan').openPopup();
-  setAntarFields(lat, lon);
-  fitMapToMarkers();
-  updateSummaryFields();
-}
+    function initMapPicker(){
+      const mapDiv = document.getElementById('map');
+      map = L.map(mapDiv).setView([-6.200, 106.816], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
 
-function setJemputFields(lat,lon) {
-  document.getElementById('lokasiJemput').value = `https://www.google.com/maps?q=${lat},${lon}`;
-  document.getElementById('coordJemput').value = `${lat.toFixed(6)},${lon.toFixed(6)}`;
-  document.getElementById('infoJemput').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-}
-function setAntarFields(lat,lon) {
-  document.getElementById('lokasiTujuan').value = `https://www.google.com/maps?q=${lat},${lon}`;
-  document.getElementById('coordAntar').value = `${lat.toFixed(6)},${lon.toFixed(6)}`;
-  document.getElementById('infoAntar').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-}
+      pickerMarker = L.marker(map.getCenter(), { draggable: true }).addTo(map);
+    }
 
-function fitMapToMarkers() {
-  const arr = [];
-  if (markerJemput && map.hasLayer(markerJemput)) arr.push(markerJemput.getLatLng());
-  if (markerAntar && map.hasLayer(markerAntar)) arr.push(markerAntar.getLatLng());
-  if (arr.length === 0) return;
-  if (arr.length === 1) { map.setView(arr[0], 15); return; }
-  const group = L.featureGroup([markerJemput, markerAntar].filter(m => map.hasLayer(m)));
-  map.fitBounds(group.getBounds().pad(0.2));
-}
+    // Open map picker modal and set handler
+    function openMapPicker(lat, lng, title, cb){
+      currentPickerCallback = cb;
+      currentPickerTitle = title || "Pilih Lokasi";
+      document.getElementById('mapPickerTitle').innerText = currentPickerTitle;
+      const mapModalEl = document.getElementById('modalMapPicker');
+      const mapModal = new bootstrap.Modal(mapModalEl);
+      mapModal.show();
 
-/* ---------- Geolocation helpers with clear errors ---------- */
-function setJemputFromGPS(){
-  if (!navigator.geolocation) return alert('Browser tidak mendukung geolocation.');
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat = pos.coords.latitude, lon = pos.coords.longitude;
-    if (!map) bukaMapModal('jemput');
-    placeJemput(lat, lon, true);
-    // focus modal map if open
-    try{ map.invalidateSize(); fitMapToMarkers(); } catch(e){}
-  }, err=>{
-    console.warn(err);
-    if (err.code === 1) alert('Izin lokasi ditolak. Izinkan lokasi di pengaturan browser untuk menggunakan fitur ini.');
-    else if (err.code === 2) alert('Lokasi tidak tersedia.');
-    else if (err.code === 3) alert('Timeout pengambilan lokasi. Coba lagi.');
-    else alert('Gagal mengambil lokasi: ' + (err.message || 'unknown'));
-  }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
-}
+      // set marker and view
+      if (!map) {
+        setTimeout(() => {
+          initMapPicker();
+          map.setView([lat || -6.200, lng || 106.816], lat && lng ? 15 : 13);
+          pickerMarker.setLatLng([lat || -6.200, lng || 106.816]);
+          map.invalidateSize();
+        }, 250);
+      } else {
+        map.setView([lat || -6.200, lng || 106.816], lat && lng ? 15 : 13);
+        pickerMarker.setLatLng([lat || -6.200, lng || 106.816]);
+        map.invalidateSize();
+      }
+    }
 
-function setCurrentLocationFromModal(){
-  if (!navigator.geolocation) return alert('Browser tidak mendukung geolocation.');
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat = pos.coords.latitude, lon = pos.coords.longitude;
-    const mode = document.getElementById('mapMode').value || 'jemput';
-    if (mode === 'jemput') placeJemput(lat, lon, true);
-    else placeAntar(lat, lon, true);
-    try{ map.invalidateSize(); fitMapToMarkers(); } catch(e){}
-  }, err=>{
-    console.warn(err);
-    alert('Gagal mengambil lokasi saat ini. Periksa izin lokasi di browser.');
-  }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
-}
+    // Reverse geocode (Nominatim)
+    async function reverseGeocode(lat, lon){
+      try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2`);
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        return data.display_name || null;
+      } catch (e) { return null; }
+    }
 
-/* ---------- Distance & cost ---------- */
-function haversine(lat1, lon1, lat2, lon2){
-  const R=6371;
-  const dLat=(lat2-lat1)*Math.PI/180;
-  const dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
+    // Geocode search (Nominatim)
+    async function geocodeQuery(q){
+      try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&limit=5`);
+        if (!resp.ok) return [];
+        const data = await resp.json();
+        return data; // array
+      } catch (e) { return []; }
+    }
 
-function updateSummaryFields(){
-  document.getElementById('infoJemput').innerText = latJemput ? `${latJemput.toFixed(6)}, ${lonJemput.toFixed(6)}` : '-';
-  document.getElementById('infoAntar').innerText = latAntar ? `${latAntar.toFixed(6)}, ${lonAntar.toFixed(6)}` : '-';
-  if (latJemput && latAntar) {
-    const jarak = haversine(latJemput, lonJemput, latAntar, lonAntar);
-    const jarakRounded = parseFloat(jarak.toFixed(2));
-    const biaya = Math.ceil(jarak * TARIF_PER_KM); // ceil per km
-    document.getElementById('infoJarak').innerText = jarakRounded;
-    document.getElementById('infoBiaya').innerText = 'Rp ' + biaya.toLocaleString('id-ID');
-    document.getElementById('infoJarakWrap').style.display = 'inline-block';
-    document.getElementById('infoBiayaWrap').style.display = 'inline-block';
-    // fill form fields
-    document.getElementById('jarak').value = jarakRounded;
-    document.getElementById('estimasiBiaya').value = 'Rp ' + biaya.toLocaleString('id-ID');
-  } else {
-    document.getElementById('infoJarak').innerText = '-';
-    document.getElementById('infoBiaya').innerText = '-';
-    document.getElementById('infoJarakWrap').style.display = 'none';
-    document.getElementById('infoBiayaWrap').style.display = 'none';
-    document.getElementById('jarak').value = '';
-    document.getElementById('estimasiBiaya').value = '';
-  }
-}
+    // On save map location
+    document.getElementById('saveMapLocation').addEventListener('click', async ()=>{
+      const latlng = pickerMarker.getLatLng();
+      const address = await reverseGeocode(latlng.lat, latlng.lng);
+      // call callback
+      if (typeof currentPickerCallback === "function") currentPickerCallback({
+        lat: latlng.lat, lng: latlng.lng, address: address || `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`
+      });
+      // hide modal
+      const mapModalEl = document.getElementById('modalMapPicker');
+      bootstrap.Modal.getInstance(mapModalEl).hide();
+    });
 
-/* ---------- Button: recompute from form ---------- */
-function hitungJarakDariForm(){
-  if (!latJemput || !latAntar) return alert('Tentukan Titik Jemput dan Titik Tujuan terlebih dahulu.');
-  updateSummaryFields();
-  alert('Estimasi diperbarui.');
-}
+    // When modal map shown, invalidate size
+    document.getElementById('modalMapPicker').addEventListener('shown.bs.modal', function(){
+      setTimeout(()=> map.invalidateSize(), 200);
+    });
 
-/* ---------- Send order (WA) ---------- */
-function kirimPesanan(){
-  const nama = document.getElementById('nama').value.trim();
-  const alamat = document.getElementById('alamatDetail').value.trim();
-  const lokasiJ = document.getElementById('lokasiJemput').value;
-  const lokasiA = document.getElementById('lokasiTujuan').value;
-  const coordJ = document.getElementById('coordJemput').value;
-  const coordA = document.getElementById('coordAntar').value;
-  const jarakVal = document.getElementById('jarak').value || '-';
-  const estimasi = document.getElementById('estimasiBiaya').value || '-';
-  const pertanyaan = document.getElementById('pertanyaanBiaya').value.trim();
-  const metode = document.getElementById('metodeBayar').value;
-  const catatan = document.getElementById('catatan').value.trim();
+    // Hook up map picker buttons for each form
+    // ANTAR
+    let antarPick = null, antarDrop = null;
+    document.getElementById('btnSetJemput').addEventListener('click', ()=>{
+      openMapPicker(antarPick?.lat, antarPick?.lng, "Set Lokasi Jemput", (loc)=>{
+        antarPick = loc;
+        document.getElementById('antar_jemput_text').value = loc.address;
+        updateAntarEstimasi();
+      });
+    });
+    document.getElementById('btnSetTujuan').addEventListener('click', ()=>{
+      openMapPicker(antarDrop?.lat, antarDrop?.lng, "Set Lokasi Tujuan", (loc)=>{
+        antarDrop = loc;
+        document.getElementById('antar_tujuan_text').value = loc.address;
+        updateAntarEstimasi();
+      });
+    });
+    document.getElementById('btnCariTujuan').addEventListener('click', async ()=>{
+      const q = document.getElementById('tujuan_search').value.trim();
+      const resultsDiv = document.getElementById('tujuan_results');
+      resultsDiv.innerHTML = 'Mencari...';
+      const res = await geocodeQuery(q);
+      if (!res || res.length===0) { resultsDiv.innerHTML = '<div class="text-danger small">Hasil tidak ditemukan</div>'; return; }
+      resultsDiv.innerHTML = '';
+      res.forEach(r =>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-outline-secondary me-2 mb-2';
+        btn.innerText = r.display_name;
+        btn.addEventListener('click', ()=>{
+          antarDrop = { lat: parseFloat(r.lat), lng: parseFloat(r.lon), address: r.display_name };
+          document.getElementById('antar_tujuan_text').value = r.display_name;
+          resultsDiv.innerHTML = '<div class="small text-success">Lokasi dipilih dari hasil pencarian.</div>';
+          updateAntarEstimasi();
+        });
+        resultsDiv.appendChild(btn);
+      });
+    });
 
-  if (!nama) return alert('Isi nama lengkap!');
-  if (!lokasiJ) return alert('Tentukan lokasi jemput terlebih dahulu!');
-  if ((layananDipilih === 'Antar Jemput' || layananDipilih === 'Kirim Paket') && !lokasiA) return alert('Tentukan lokasi tujuan terlebih dahulu!');
+    // KIRIM
+    let kirimPick = null, kirimDrop = null;
+    document.getElementById('btnSetPick').addEventListener('click', ()=>{
+      openMapPicker(kirimPick?.lat, kirimPick?.lng, "Set Lokasi Pengambilan", (loc)=>{
+        kirimPick = loc;
+        document.getElementById('kirim_pick_text').value = loc.address;
+        updateKirimEstimasi();
+      });
+    });
+    document.getElementById('btnSetDrop').addEventListener('click', ()=>{
+      openMapPicker(kirimDrop?.lat, kirimDrop?.lng, "Set Lokasi Tujuan", (loc)=>{
+        kirimDrop = loc;
+        document.getElementById('kirim_drop_text').value = loc.address;
+        updateKirimEstimasi();
+      });
+    });
+    document.getElementById('btnCariKirimTujuan').addEventListener('click', async ()=>{
+      const q = document.getElementById('kirim_tujuan_search').value.trim();
+      const resultsDiv = document.getElementById('kirim_tujuan_results');
+      resultsDiv.innerHTML = 'Mencari...';
+      const res = await geocodeQuery(q);
+      if (!res || res.length===0) { resultsDiv.innerHTML = '<div class="text-danger small">Hasil tidak ditemukan</div>'; return; }
+      resultsDiv.innerHTML = '';
+      res.forEach(r =>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-outline-secondary me-2 mb-2';
+        btn.innerText = r.display_name;
+        btn.addEventListener('click', ()=>{
+          kirimDrop = { lat: parseFloat(r.lat), lng: parseFloat(r.lon), address: r.display_name };
+          document.getElementById('kirim_drop_text').value = r.display_name;
+          resultsDiv.innerHTML = '<div class="small text-success">Lokasi dipilih dari hasil pencarian.</div>';
+          updateKirimEstimasi();
+        });
+        resultsDiv.appendChild(btn);
+      });
+    });
 
-  let pesan = `🛵 PESANAN ${layananDipilih.toUpperCase()}%0A`;
-  pesan += `👤 Nama: ${encodeURIComponent(nama)}%0A`;
-  if (alamat) pesan += `🏠 Alamat singkat: ${encodeURIComponent(alamat)}%0A`;
-  pesan += `📍 Jemput: ${lokasiJ}%0A🔢 Koordinat Jemput: ${coordJ}%0A`;
-  if (lokasiA) pesan += `🎯 Tujuan: ${lokasiA}%0A🔢 Koordinat Tujuan: ${coordA}%0A📏 Jarak: ${jarakVal} km%0A💰 Estimasi: ${encodeURIComponent(estimasi)}%0A`;
-  if (pertanyaan) pesan += `❓ Pertanyaan Biaya: ${encodeURIComponent(pertanyaan)}%0A`;
-  pesan += `💳 Pembayaran: ${encodeURIComponent(metode)}%0A📝 Catatan: ${encodeURIComponent(catatan)}`;
+    // Update estimasi antar
+    function updateAntarEstimasi(){
+      const elJarak = document.getElementById('est_jarak');
+      const elRaw = document.getElementById('est_tarif_raw');
+      const elRounded = document.getElementById('est_tarif');
+      if (antarPick && antarDrop){
+        const km = haversine(antarPick.lat, antarPick.lng, antarDrop.lat, antarDrop.lng);
+        const kmRounded = (Math.round(km*100)/100).toFixed(2);
+        const fares = calcFare(km);
+        elJarak.innerText = kmRounded;
+        elRaw.innerText = 'Rp ' + numberWithCommas(fares.raw);
+        elRounded.innerText = 'Rp ' + numberWithCommas(fares.rounded);
+      } else {
+        elJarak.innerText = '-';
+        elRaw.innerText = '-';
+        elRounded.innerText = '-';
+      }
+    }
 
-  const waUrl = `https://wa.me/${ADMIN_WA}?text=${pesan}`;
-  window.open(waUrl, '_blank');
-  showToast('Mengarahkan ke WhatsApp...');
-  setTimeout(()=>{ tutupForm(); }, 900);
-}
+    function updateKirimEstimasi(){
+      const elJarak = document.getElementById('kirim_jarak');
+      const elRaw = document.getElementById('kirim_tarif_raw');
+      const elRounded = document.getElementById('kirim_tarif');
+      if (kirimPick && kirimDrop){
+        const km = haversine(kirimPick.lat, kirimPick.lng, kirimDrop.lat, kirimDrop.lng);
+        const kmRounded = (Math.round(km*100)/100).toFixed(2);
+        const fares = calcFare(km);
+        elJarak.innerText = kmRounded;
+        elRaw.innerText = 'Rp ' + numberWithCommas(fares.raw);
+        elRounded.innerText = 'Rp ' + numberWithCommas(fares.rounded);
+      } else {
+        elJarak.innerText = '-';
+        elRaw.innerText = '-';
+        elRounded.innerText = '-';
+      }
+    }
 
-/* ---------- Utilities ---------- */
-// allow closing popup by clicking outside
-document.getElementById('popupForm').addEventListener('click', function(e){
-  if (e.target === this) tutupForm();
-});
-// clicking outside map modal closes modal
-document.getElementById('mapModal').addEventListener('click', function(e){
-  if (e.target === this) tutupMapModal();
-});
+    function numberWithCommas(x){
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
-// expose some functions to onclick attributes
-window.bukaForm = bukaForm;
-window.tutupForm = tutupForm;
-window.bukaMapModal = bukaMapModal;
-window.tutupMapModal = tutupMapModal;
-window.setJemputFromGPS = setJemputFromGPS;
-window.setCurrentLocationFromModal = setCurrentLocationFromModal;
-window.placeJemput = placeJemput;
-window.placeAntar = placeAntar;
-window.hitungJarakDariForm = hitungJarakDariForm;
-window.kirimPesanan = kirimPesanan;
+    // Form submit handlers to build WA message
+    document.getElementById('formAntar').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('antar_nama').value || '-';
+      if (!antarPick || !antarDrop){
+        alert('Mohon set lokasi jemput dan tujuan terlebih dahulu.');
+        return;
+      }
+      const km = haversine(antarPick.lat, antarPick.lng, antarDrop.lat, antarDrop.lng);
+      const fares = calcFare(km);
+      const message = 
+        `*Order Antar Jemput*%0A` +
+        `Nama: ${encodeURIComponent(name)}%0A` +
+        `Jemput: ${encodeURIComponent(antarPick.address)} (%20lat:${antarPick.lat.toFixed(6)},lng:${antarPick.lng.toFixed(6)}%20)%0A` +
+        `Tujuan: ${encodeURIComponent(antarDrop.address)} (%20lat:${antarDrop.lat.toFixed(6)},lng:${antarDrop.lng.toFixed(6)}%20)%0A` +
+        `Jarak: ${km.toFixed(2)} km%0A` +
+        `Tarif (kotor): Rp ${numberWithCommas(fares.raw)}%0A` +
+        `Tarif (dibulatkan): Rp ${numberWithCommas(fares.rounded)}%0A` +
+        `Catatan: -`;
+      // open wa
+      window.open(`https://wa.me/${ADMIN_WA}?text=${message}`, "_blank");
+    });
 
-/* ---------- Auto-init note ----------
-   Map is lazy-initialized on first open to avoid loading cost.
-   Make sure to test on HTTPS (GitHub Pages) so navigator.geolocation works.
---------------------------------------*/
-</script>
+    document.getElementById('formKirim').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('kirim_nama').value || '-';
+      const desc = document.getElementById('kirim_desc').value || '-';
+      if (!kirimPick || !kirimDrop){
+        alert('Mohon set lokasi pengambilan dan tujuan terlebih dahulu.');
+        return;
+      }
+      const km = haversine(kirimPick.lat, kirimPick.lng, kirimDrop.lat, kirimDrop.lng);
+      const fares = calcFare(km);
+      const message =
+        `*Order Kirim Paket*%0A` +
+        `Nama: ${encodeURIComponent(name)}%0A` +
+        `Pengambilan: ${encodeURIComponent(kirimPick.address)} (%20lat:${kirimPick.lat.toFixed(6)},lng:${kirimPick.lng.toFixed(6)}%20)%0A` +
+        `Tujuan: ${encodeURIComponent(kirimDrop.address)} (%20lat:${kirimDrop.lat.toFixed(6)},lng:${kirimDrop.lng.toFixed(6)}%20)%0A` +
+        `Jarak: ${km.toFixed(2)} km%0A` +
+        `Tarif (kotor): Rp ${numberWithCommas(fares.raw)}%0A` +
+        `Tarif (dibulatkan): Rp ${numberWithCommas(fares.rounded)}%0A` +
+        `Deskripsi Paket: ${encodeURIComponent(desc)}`;
+      window.open(`https://wa.me/${ADMIN_WA}?text=${message}`, "_blank");
+    });
+
+    // Bersihin Rumah submit
+    document.getElementById('formBersihinRumah').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('br_nama').value || '-';
+      const alamat = document.getElementById('br_alamat').value || '-';
+      const kebutuhan = document.getElementById('br_kebutuhan').value || '-';
+      const pertanyaan = document.getElementById('br_pertanyaan').value || '-';
+      const locText = document.getElementById('br_loc_text').value || '-';
+      const message =
+        `*Order Bersihin Rumah*%0A` +
+        `Nama: ${encodeURIComponent(name)}%0A` +
+        `Alamat: ${encodeURIComponent(alamat)}%0A` +
+        `Lokasi: ${encodeURIComponent(locText)}%0A` +
+        `Kebutuhan: ${encodeURIComponent(kebutuhan)}%0A` +
+        `Pertanyaan: ${encodeURIComponent(pertanyaan)}`;
+      window.open(`https://wa.me/${ADMIN_WA}?text=${message}`, "_blank");
+    });
+
+    // Bersihin Kebun submit
+    document.getElementById('formBersihinKebun').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('bk_nama').value || '-';
+      const alamat = document.getElementById('bk_alamat').value || '-';
+      const kebutuhan = document.getElementById('bk_kebutuhan').value || '-';
+      const pertanyaan = document.getElementById('bk_pertanyaan').value || '-';
+      const locText = document.getElementById('bk_loc_text').value || '-';
+      const message =
+        `*Order Bersihin Kebun*%0A` +
+        `Nama: ${encodeURIComponent(name)}%0A` +
+        `Alamat: ${encodeURIComponent(alamat)}%0A` +
+        `Lokasi: ${encodeURIComponent(locText)}%0A` +
+        `Kebutuhan: ${encodeURIComponent(kebutuhan)}%0A` +
+        `Pertanyaan: ${encodeURIComponent(pertanyaan)}`;
+      window.open(`https://wa.me/${ADMIN_WA}?text=${message}`, "_blank");
+    });
+
+    // Tempel Ban submit
+    document.getElementById('formTempelBan').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('tb_nama').value || '-';
+      const alamat = document.getElementById('tb_alamat').value || '-';
+      const kebutuhan = document.getElementById('tb_kebutuhan').value || '-';
+      const pertanyaan = document.getElementById('tb_pertanyaan').value || '-';
+      const locText = document.getElementById('tb_loc_text').value || '-';
+      const message =
+        `*Order Tempel Ban*%0A` +
+        `Nama: ${encodeURIComponent(name)}%0A` +
+        `Alamat: ${encodeURIComponent(alamat)}%0A` +
+        `Lokasi: ${encodeURIComponent(locText)}%0A` +
+        `Kebutuhan: ${encodeURIComponent(kebutuhan)}%0A` +
+        `Pertanyaan: ${encodeURIComponent(pertanyaan)}`;
+      window.open(`https://wa.me/${ADMIN_WA}?text=${message}`, "_blank");
+    });
+
+    // GPS-based set location for services that ask for GPS permission
+    async function setLocationByGPS(targetInputId){
+      if (!navigator.geolocation) { alert('Browser tidak mendukung geolocation.'); return; }
+      navigator.geolocation.getCurrentPosition(async (pos)=>{
+        const lat = pos.coords.latitude, lon = pos.coords.longitude;
+        const address = await reverseGeocode(lat, lon);
+        document.getElementById(targetInputId).value = address || `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+      }, (err)=>{
+        alert('Gagal mengambil lokasi. Pastikan izinkan GPS di browser/perangkat Anda.');
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    // Connect GPS buttons to inputs
+    document.getElementById('btnBrSetLoc').addEventListener('click', ()=>{
+      // allow either GPS or map
+      if (confirm('Gunakan lokasi GPS sekarang? (OK = GPS, Cancel = pilih di peta)')) {
+        setLocationByGPS('br_loc_text');
+      } else {
+        openMapPicker(null, null, "Pilih Lokasi Bersihin Rumah", async (loc)=>{
+          document.getElementById('br_loc_text').value = loc.address;
+        });
+      }
+    });
+    document.getElementById('btnBkSetLoc').addEventListener('click', ()=>{
+      if (confirm('Gunakan lokasi GPS sekarang? (OK = GPS, Cancel = pilih di peta)')) {
+        setLocationByGPS('bk_loc_text');
+      } else {
+        openMapPicker(null,null,"Pilih Lokasi Bersihin Kebun", async (loc)=>{
+          document.getElementById('bk_loc_text').value = loc.address;
+        });
+      }
+    });
+    document.getElementById('btnTbSetLoc').addEventListener('click', ()=>{
+      if (confirm('Gunakan lokasi GPS sekarang? (OK = GPS, Cancel = pilih di peta)')) {
+        setLocationByGPS('tb_loc_text');
+      } else {
+        openMapPicker(null,null,"Pilih Lokasi Tempel Ban", async (loc)=>{
+          document.getElementById('tb_loc_text').value = loc.address;
+        });
+      }
+    });
+
+    // Simple navigation buttons (placeholder)
+    document.getElementById('navHome').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+    document.getElementById('navQuestion').addEventListener('click', ()=> {
+      const text = encodeURIComponent("Halo Admin, saya mau tanya layanan...");
+      window.open(`https://wa.me/${ADMIN_WA}?text=${text}`, "_blank");
+    });
+    document.getElementById('navProfile').addEventListener('click', ()=> alert('Profil belum dibuat.'));
+
+    // Initialize map picker once document loaded
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // Pre-initialize small map after a delay to avoid rendering issues
+      setTimeout(()=> {
+        initMapPicker();
+      }, 300);
+
+      // Ensure when any modal opens we fix map size
+      const modalIds = ['modalAntar','modalKirim','modalMapPicker'];
+      modalIds.forEach(id=>{
+        const el = document.getElementById(id);
+        el && el.addEventListener('shown.bs.modal', ()=> { if (map) map.invalidateSize(); });
+      });
+    });
+
+    // Ensure map marker follows map click when user clicks on the map picker
+    // (Leaflet added, we add click handler)
+    (function waitForMap(){
+      if (window.map && window.pickerMarker){
+        map.on('click', function(e){
+          pickerMarker.setLatLng(e.latlng);
+        });
+      } else {
+        setTimeout(waitForMap, 300);
+      }
+    })();
+
+    // Small UX: when choosing location from search result, maybe zoom map
+    // Already handled by opening picker and setting center when open
+
+    // Note: Nominatim has usage policy -> avoid heavy/prod use without proper setup.
+  </script>
+
 </body>
 </html>
