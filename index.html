@@ -1,855 +1,294 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>SIAP SURUH, SIAP ANTAR</title>
-
-  <!-- Bootstrap 5 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Siap Suruh, Siap Antar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    :root{
-      --accent-green:#28a745;
-      --accent-orange:#ff8a00;
-      --bg-white:#ffffff;
+    body {
+      background-color: #ffffff;
+      font-family: 'Poppins', sans-serif;
     }
-    body {background: linear-gradient(180deg, #f8fff5 0%, #ffffff 100%); font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-    .app-header {background: linear-gradient(90deg, var(--accent-green), var(--accent-orange)); color: #fff; padding: 18px 16px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);}
-    .app-title {font-weight:700; font-size:1.15rem; letter-spacing:0.6px;}
-    .app-sub {font-size:0.85rem; opacity:0.95;}
-    .category-card {border-radius:12px;}
-    .bottom-nav {position: fixed; left:0; right:0; bottom:0; background: #fff; border-top:1px solid #eee; padding:8px 12px; display:flex; justify-content:space-around; z-index:1050;}
-    .map-container {height:320px;}
-    .leaflet-container {height:100%; width:100%;}
-    .service-icon {width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,0.9);box-shadow:0 4px 10px rgba(0,0,0,0.05);}
-    .btn-cta {background: linear-gradient(90deg,var(--accent-green),var(--accent-orange)); color:#fff; border: none;}
-    .rounded-card {border-radius:14px; box-shadow: 0 8px 24px rgba(15,15,15,0.05);}
-    /* mobile spacing */
-    .container-mobile {padding-bottom:96px;}
-    .small-muted {font-size:0.82rem; color:#6c757d;}
+    .banner {
+      background: linear-gradient(90deg, #2ecc71, #f39c12);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+      font-size: 20px;
+      border-radius: 0 0 20px 20px;
+    }
+    .menu-card {
+      border-radius: 20px;
+      transition: transform 0.2s;
+    }
+    .menu-card:hover {
+      transform: scale(1.03);
+    }
+    .menu-icon {
+      width: 60px;
+      height: 60px;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+      border-radius: 10px;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      border-top: 2px solid #ccc;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+    }
+    .bottom-nav button {
+      border: none;
+      background: none;
+      color: #2ecc71;
+      font-weight: bold;
+    }
   </style>
 </head>
+
 <body>
 
-  <div class="container pt-3 container-mobile">
+  <div class="banner">SIAP SURUH, SIAP ANTAR</div>
 
-    <!-- Header / Banner -->
-    <div class="app-header mb-3 rounded-card">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="app-title">SIAP SURUH, SIAP ANTAR</div>
-          <div class="app-sub small-muted">Layanan jasa suruhan & antar jemput siap bantu</div>
-        </div>
-        <div class="text-end">
-          <!-- simple motor icon -->
-          <div style="font-size:20px; background: rgba(255,255,255,0.15); padding:8px 10px; border-radius:10px;">
-            <i class="bi bi-send-fill"></i>
-          </div>
+  <div class="container my-4">
+    <div class="row g-3 text-center">
+
+      <!-- Menu Antar Jemput -->
+      <div class="col-6">
+        <div class="card p-3 shadow menu-card" onclick="openForm('antar')">
+          <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" class="menu-icon mx-auto mb-2">
+          <h6>Jasa Antar</h6>
         </div>
       </div>
-    </div>
 
-    <!-- Category grid -->
-    <div class="row g-2">
-      <!-- Antar Jemput -->
+      <!-- Menu Kirim Paket -->
       <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalAntar" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <!-- motorbike svg -->
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#28a745" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 13a3 3 0 100 6 3 3 0 000-6zm0 2a1 1 0 110 2 1 1 0 010-2zM21 13a3 3 0 100 6 3 3 0 000-6zm0 2a1 1 0 110 2 1 1 0 010-2zM8 9h6l2 4h2" stroke="#28a745" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
-            </div>
-            <div>
-              <div class="fw-bold">Antar Jemput</div>
-              <div class="small-muted">Pengantaran / Jemput orang</div>
-            </div>
-          </div>
-        </button>
+        <div class="card p-3 shadow menu-card" onclick="openForm('paket')">
+          <img src="https://cdn-icons-png.flaticon.com/512/679/679720.png" class="menu-icon mx-auto mb-2">
+          <h6>Kirim Paket</h6>
+        </div>
       </div>
 
-      <!-- Kirim Paket -->
+      <!-- Menu Bersihin Rumah -->
       <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalKirim" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <i class="bi bi-box-seam" style="font-size:20px; color:#ff8a00;"></i>
-            </div>
-            <div>
-              <div class="fw-bold">Kirim Paket</div>
-              <div class="small-muted">Kirim barang / paket</div>
-            </div>
-          </div>
-        </button>
+        <div class="card p-3 shadow menu-card" onclick="openForm('rumah')">
+          <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" class="menu-icon mx-auto mb-2">
+          <h6>Bersihin Rumah</h6>
+        </div>
       </div>
 
-      <!-- Bersihin Rumah -->
+      <!-- Menu Bersihin Kebun -->
       <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalBersihinRumah" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <i class="bi bi-house-fill" style="font-size:18px; color:#28a745;"></i>
-            </div>
-            <div>
-              <div class="fw-bold">Bersihin Rumah</div>
-              <div class="small-muted">Jasa bersih rumah</div>
-            </div>
-          </div>
-        </button>
+        <div class="card p-3 shadow menu-card" onclick="openForm('kebun')">
+          <img src="https://cdn-icons-png.flaticon.com/512/3319/3319221.png" class="menu-icon mx-auto mb-2">
+          <h6>Bersihin Kebun</h6>
+        </div>
       </div>
 
-      <!-- Bersihin Kebun -->
+      <!-- Menu Tempel Ban -->
       <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalBersihinKebun" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <i class="bi bi-tree-fill" style="font-size:18px; color:#28a745;"></i>
-            </div>
-            <div>
-              <div class="fw-bold">Bersihin Kebun</div>
-              <div class="small-muted">Perawatan & pembersihan kebun</div>
-            </div>
-          </div>
-        </button>
+        <div class="card p-3 shadow menu-card" onclick="openForm('ban')">
+          <img src="https://cdn-icons-png.flaticon.com/512/1041/1041852.png" class="menu-icon mx-auto mb-2">
+          <h6>Tempel Ban</h6>
+        </div>
       </div>
 
-      <!-- Tempel Ban -->
+      <!-- Menu Tukang Bangunan -->
       <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalTempelBan" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <i class="bi bi-circle-fill" style="font-size:14px; color:#ff8a00;"></i>
-            </div>
-            <div>
-              <div class="fw-bold">Tempel Ban</div>
-              <div class="small-muted">Tukar / tempel ban motor</div>
-            </div>
-          </div>
-        </button>
-      </div>
-
-      <!-- Tukang Bangunan -->
-      <div class="col-6">
-        <button class="w-100 p-2 category-card btn btn-light text-start" data-bs-toggle="modal" data-bs-target="#modalTukang" >
-          <div class="d-flex align-items-center">
-            <div class="service-icon me-3">
-              <i class="bi bi-tools" style="font-size:18px; color:#28a745;"></i>
-            </div>
-            <div>
-              <div class="fw-bold">Tukang Bangunan</div>
-              <div class="small-muted">Perbaikan & bangun</div>
-            </div>
-          </div>
-        </button>
+        <div class="card p-3 shadow menu-card" onclick="openForm('bangunan')">
+          <img src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png" class="menu-icon mx-auto mb-2">
+          <h6>Tukang Bangunan</h6>
+        </div>
       </div>
 
     </div>
+  </div>
 
-    <!-- Info kecil -->
-    <div class="mt-3 text-center small-muted">
-      Pilih layanan -> isi form -> set lokasi melalui peta atau ketik alamat -> kirim via WhatsApp.
+  <!-- Popup Form -->
+  <div class="modal fade" id="formModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="formTitle"></h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="orderForm"></form>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <!-- Map Modal -->
+  <div class="modal fade" id="mapModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title">Pilih Lokasi di Peta</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="map"></div>
+          <button class="btn btn-success w-100 mt-3" id="confirmLocation">Konfirmasi Lokasi</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Nav -->
   <div class="bottom-nav">
-    <button class="btn btn-sm w-25 d-flex flex-column align-items-center" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-      <i class="bi bi-house-door-fill" style="font-size:18px; color:var(--accent-green)"></i>
-      <div style="font-size:11px">Home</div>
-    </button>
-    <button class="btn btn-sm w-25 d-flex flex-column align-items-center" onclick="openWAchat()">
-      <i class="bi bi-question-circle-fill" style="font-size:18px; color:var(--accent-orange)"></i>
-      <div style="font-size:11px">Pertanyaan</div>
-    </button>
-    <button class="btn btn-sm w-25 d-flex flex-column align-items-center" onclick="alert('Profil belum disetup')">
-      <i class="bi bi-person-circle" style="font-size:18px; color:#6c757d"></i>
-      <div style="font-size:11px">Profil</div>
-    </button>
+    <button>🏠 Home</button>
+    <button>❓ Pertanyaan</button>
+    <button>👤 Profil</button>
   </div>
 
-  <!-- ===== MODAL: Antar Jemput ===== -->
-  <div class="modal fade" id="modalAntar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Antar Jemput</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formAntar">
-            <div class="mb-2">
-              <label class="form-label">Nama</label>
-              <input name="nama" class="form-control" required placeholder="Nama pelanggan">
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Lokasi Jemputan</label>
-              <div class="input-group mb-2">
-                <input id="pickupText" class="form-control" placeholder="Belum diset. Klik 'Set Lokasi' atau gunakan GPS" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('pickup')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('pickup')">Gunakan GPS saya</button>
-              </div>
-              <div class="small-muted">Hasil lokasi akan berupa link yang bisa diklik</div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Tujuan Antar</label>
-              <div class="input-group mb-2">
-                <input id="dropText" class="form-control" placeholder="Bisa ketik alamat lalu tekan 'Cari alamat' atau gunakan 'Set Lokasi'" >
-                <button type="button" class="btn btn-outline-primary" onclick="geocodeAddressFor('drop')">Cari alamat</button>
-              </div>
-              <div class="d-flex gap-2 mt-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('drop')">Set Lokasi di Peta</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('drop')">Gunakan GPS saya</button>
-              </div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Metode Bayar</label>
-              <select id="metodeBayarAntar" class="form-select">
-                <option value="CASH">CASH</option>
-                <option value="TRANSFER">TRANSFER</option>
-                <option value="QRIS">QRIS</option>
-              </select>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Estimasi Jarak & Tarif</label>
-              <div class="p-2 rounded-card" style="background:#fff;">
-                <div class="d-flex justify-content-between">
-                  <div>Jarak</div>
-                  <div id="jarakText">-</div>
-                </div>
-                <div class="d-flex justify-content-between">
-                  <div>Tarif (6.000/km)</div>
-                  <div id="tarifText">-</div>
-                </div>
-                <div class="small-muted mt-1">Pembulatan ke 1.000 (sisa < 500 → turun; ≥500 → naik)</div>
-              </div>
-            </div>
-
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendAntarWA()">Kirim Pesanan via WhatsApp</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL: Kirim Paket (sama struktur dengan Antar) ===== -->
-  <div class="modal fade" id="modalKirim" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Kirim Paket</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formKirim">
-            <div class="mb-2">
-              <label class="form-label">Nama</label>
-              <input name="nama" class="form-control" required placeholder="Nama pengirim">
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Lokasi Jemput Paket</label>
-              <div class="input-group mb-2">
-                <input id="k_pickupText" class="form-control" placeholder="Belum diset. Klik 'Set Lokasi' atau gunakan GPS" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('k_pickup')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('k_pickup')">Gunakan GPS saya</button>
-              </div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Tujuan Paket</label>
-              <div class="input-group mb-2">
-                <input id="k_dropText" class="form-control" placeholder="Bisa ketik alamat lalu tekan 'Cari alamat' atau gunakan 'Set Lokasi'">
-                <button type="button" class="btn btn-outline-primary" onclick="geocodeAddressFor('k_drop')">Cari alamat</button>
-              </div>
-              <div class="d-flex gap-2 mt-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('k_drop')">Set Lokasi di Peta</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('k_drop')">Gunakan GPS saya</button>
-              </div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Metode Bayar</label>
-              <select id="metodeBayarKirim" class="form-select">
-                <option value="CASH">CASH</option>
-                <option value="TRANSFER">TRANSFER</option>
-                <option value="QRIS">QRIS</option>
-              </select>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label">Estimasi Jarak & Tarif</label>
-              <div class="p-2 rounded-card" style="background:#fff;">
-                <div class="d-flex justify-content-between">
-                  <div>Jarak</div>
-                  <div id="k_jarakText">-</div>
-                </div>
-                <div class="d-flex justify-content-between">
-                  <div>Tarif (6.000/km)</div>
-                  <div id="k_tarifText">-</div>
-                </div>
-                <div class="small-muted mt-1">Pembulatan ke 1.000 (sisa < 500 → turun; ≥500 → naik)</div>
-              </div>
-            </div>
-
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendKirimWA()">Kirim Pesanan via WhatsApp</button>
-            </div>
-
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL: Bersihin Rumah ===== -->
-  <div class="modal fade" id="modalBersihinRumah" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Bersihin Rumah</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formBersihRumah">
-            <div class="mb-2"><label class="form-label">Nama</label><input name="nama" class="form-control" required></div>
-            <div class="mb-2">
-              <label class="form-label">Alamat Lengkap</label>
-              <input id="br_alamat" class="form-control" placeholder="Alamat lengkap">
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Set Lokasi</label>
-              <div class="d-flex gap-2">
-                <input id="br_loc_text" class="form-control" placeholder="Belum diset" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('br')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('br')">GPS</button>
-              </div>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Kebutuhan Jasa</label>
-              <textarea id="br_kebutuhan" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Pertanyaan Estimasi Biaya</label>
-              <textarea id="br_est" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendSimpleServiceWA('Bersihin Rumah')">Kirim Pesanan via WhatsApp</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL: Bersihin Kebun ===== -->
-  <div class="modal fade" id="modalBersihinKebun" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Bersihin Kebun</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formBersihKebun">
-            <div class="mb-2"><label class="form-label">Nama</label><input name="nama" class="form-control" required></div>
-            <div class="mb-2">
-              <label class="form-label">Alamat Lengkap</label>
-              <input id="bk_alamat" class="form-control" placeholder="Alamat lengkap">
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Set Lokasi</label>
-              <div class="d-flex gap-2">
-                <input id="bk_loc_text" class="form-control" placeholder="Belum diset" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('bk')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('bk')">GPS</button>
-              </div>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Kebutuhan Jasa</label>
-              <textarea id="bk_kebutuhan" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Pertanyaan Estimasi Biaya</label>
-              <textarea id="bk_est" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendSimpleServiceWA('Bersihin Kebun')">Kirim Pesanan via WhatsApp</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL: Tempel Ban ===== -->
-  <div class="modal fade" id="modalTempelBan" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Tempel Ban</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formTempel">
-            <div class="mb-2"><label class="form-label">Nama</label><input name="nama" class="form-control" required></div>
-            <div class="mb-2">
-              <label class="form-label">Alamat Lengkap</label>
-              <input id="tb_alamat" class="form-control" placeholder="Alamat lengkap">
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Set Lokasi</label>
-              <div class="d-flex gap-2">
-                <input id="tb_loc_text" class="form-control" placeholder="Belum diset" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('tb')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('tb')">GPS</button>
-              </div>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Kebutuhan Jasa</label>
-              <textarea id="tb_kebutuhan" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Pertanyaan Estimasi Biaya</label>
-              <textarea id="tb_est" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendSimpleServiceWA('Tempel Ban')">Kirim Pesanan via WhatsApp</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL: Tukang Bangunan ===== -->
-  <div class="modal fade" id="modalTukang" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Pesanan - Tukang Bangunan</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formTukang">
-            <div class="mb-2"><label class="form-label">Nama</label><input name="nama" class="form-control" required></div>
-            <div class="mb-2">
-              <label class="form-label">Alamat Lengkap</label>
-              <input id="tk_alamat" class="form-control" placeholder="Alamat lengkap">
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Set Lokasi</label>
-              <div class="d-flex gap-2">
-                <input id="tk_loc_text" class="form-control" placeholder="Belum diset" readonly>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMapModal('tk')">Set Lokasi</button>
-                <button type="button" class="btn btn-outline-success" onclick="useMyGPS('tk')">GPS</button>
-              </div>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Kebutuhan Jasa</label>
-              <textarea id="tk_kebutuhan" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Kolom Pertanyaan Estimasi Biaya</label>
-              <textarea id="tk_est" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mt-3">
-              <button type="button" class="btn btn-cta w-100" onclick="sendSimpleServiceWA('Tukang Bangunan')">Kirim Pesanan via WhatsApp</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MAP MODAL (dipakai untuk set pickup/drop untuk semua form) ===== -->
-  <div class="modal fade" id="modalMap" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="mapModalTitle">Pilih Lokasi</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeMapModal()"></button>
-        </div>
-        <div class="modal-body p-0">
-          <div id="map" class="map-container"></div>
-          <div class="p-3">
-            <div class="d-flex gap-2">
-              <button id="btnSetLocation" class="btn btn-success w-50">Simpan Lokasi</button>
-              <button id="btnClearMarker" class="btn btn-outline-danger w-50">Reset Marker</button>
-            </div>
-            <div class="mt-2 small-muted">Klik peta untuk menempatkan marker. Drag marker untuk memindahkan.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap + Leaflet + script -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
-    // Admin WA number (international format, no +)
-    const ADMIN_WA = "6285157077789";
+    const adminNumber = "6285157077789";
+    let map, marker, currentField = null;
+    let jemput = null, antar = null;
 
-    // Global map modal state
-    let mapModalTarget = null; // e.g., 'pickup', 'drop', 'k_pickup', etc.
-    let mapModal = null;
-    let leafletMap = null;
-    let currentMarker = null;
-
-    // store positions keyed by targetName
-    const positions = {}; // e.g., positions['pickup'] = {lat:...,lng:...}
-
-    // Initialize map modal when first opened
-    function openMapModal(target){
-      mapModalTarget = target;
-      const title = {pickup: 'Set Lokasi Jemput', drop:'Set Lokasi Tujuan', k_pickup:'Set Lokasi Jemput Paket', k_drop:'Set Lokasi Tujuan Paket',
-                    br:'Set Lokasi', bk:'Set Lokasi', tb:'Set Lokasi', tk:'Set Lokasi'}[target] || 'Set Lokasi';
-      document.getElementById('mapModalTitle').innerText = title;
-
-      const modalEl = document.getElementById('modalMap');
-      const bsModal = new bootstrap.Modal(modalEl);
-      bsModal.show();
-
-      setTimeout(()=>{ initLeafletMap(); }, 200);
-    }
-
-    function closeMapModal(){
-      // nothing else for now
-    }
-
-    function initLeafletMap(){
-      if(leafletMap) {
-        leafletMap.invalidateSize();
-        return;
-      }
-      leafletMap = L.map('map').setView([0.0, 0.0], 2);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(leafletMap);
-
-      // try to show user's approximate location
-      if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition((pos)=>{
-          const lat = pos.coords.latitude, lng = pos.coords.longitude;
-          leafletMap.setView([lat,lng], 14);
-        }, ()=>{}, {maximumAge:60000});
-      }
-
-      leafletMap.on('click', function(e){
-        placeMarker(e.latlng.lat, e.latlng.lng);
-      });
-
-      // marker controls
-      document.getElementById('btnSetLocation').onclick = function(){
-        if(!currentMarker) { alert('Silakan pilih titik pada peta terlebih dahulu.'); return; }
-        const latlng = currentMarker.getLatLng();
-        savePosition(mapModalTarget, latlng.lat, latlng.lng);
-        const bsModal = bootstrap.Modal.getInstance(document.getElementById('modalMap'));
-        bsModal.hide();
-        // after save, compute distances if needed
-        computeAllEstimates();
+    function openForm(type) {
+      const titleMap = {
+        antar: "Form Jasa Antar",
+        paket: "Form Kirim Paket",
+        rumah: "Form Bersihin Rumah",
+        kebun: "Form Bersihin Kebun",
+        ban: "Form Tempel Ban",
+        bangunan: "Form Tukang Bangunan"
       };
 
-      document.getElementById('btnClearMarker').onclick = function(){
-        if(currentMarker) {
-          leafletMap.removeLayer(currentMarker);
-          currentMarker = null;
-        }
-      };
+      document.getElementById('formTitle').innerText = titleMap[type];
+      const form = document.getElementById('orderForm');
+      form.innerHTML = '';
 
-      // if position already exists for this modal target, set marker
-      const pos = positions[mapModalTarget];
-      if(pos) placeMarker(pos.lat,pos.lng);
-    }
+      if (type === 'antar' || type === 'paket') {
+        form.innerHTML = `
+          <label>Nama:</label>
+          <input type="text" id="nama" class="form-control mb-2" required>
+          
+          <label>Lokasi Jemputan:</label>
+          <input type="text" id="lokasiJemput" class="form-control mb-2" readonly>
+          <button class="btn btn-outline-success w-100 mb-2" type="button" onclick="setLocation('jemput')">Set Lokasi Jemputan</button>
+          
+          <label>Tujuan Antar:</label>
+          <input type="text" id="lokasiAntar" class="form-control mb-2" readonly>
+          <button class="btn btn-outline-warning w-100 mb-2" type="button" onclick="setLocation('antar')">Set Lokasi Tujuan</button>
 
-    function placeMarker(lat,lng){
-      if(currentMarker) { currentMarker.setLatLng([lat,lng]); }
-      else {
-        currentMarker = L.marker([lat,lng], {draggable:true}).addTo(leafletMap);
-        currentMarker.on('dragend', function(){});
-      }
-      leafletMap.setView([lat,lng], 15);
-    }
+          <label>Metode Bayar:</label>
+          <select id="metode" class="form-select mb-2">
+            <option>CASH</option>
+            <option>TRANSFER</option>
+            <option>QRIS</option>
+          </select>
 
-    function savePosition(target, lat, lng){
-      positions[target] = {lat, lng};
-      const label = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-      // map to appropriate input fields
-      if(target === 'pickup') {
-        document.getElementById('pickupText').value = label;
-      } else if(target === 'drop') {
-        document.getElementById('dropText').value = label;
-      } else if(target === 'k_pickup') {
-        document.getElementById('k_pickupText').value = label;
-      } else if(target === 'k_drop') {
-        document.getElementById('k_dropText').value = label;
-      } else if(target === 'br') {
-        document.getElementById('br_loc_text').value = label;
-      } else if(target === 'bk') {
-        document.getElementById('bk_loc_text').value = label;
-      } else if(target === 'tb') {
-        document.getElementById('tb_loc_text').value = label;
-      } else if(target === 'tk') {
-        document.getElementById('tk_loc_text').value = label;
-      }
-      // store lat/lng too
-      positions[target].label = label;
-      // clear currentMarker so next open will set fresh
-      currentMarker = null;
-    }
+          <label>Estimasi Jarak (KM):</label>
+          <input type="text" id="jarak" class="form-control mb-2" readonly>
 
-    // Use browser GPS permission to set location directly
-    function useMyGPS(target){
-      if(!navigator.geolocation) { alert('GPS tidak tersedia pada perangkat ini'); return; }
-      navigator.geolocation.getCurrentPosition((pos)=>{
-        const lat = pos.coords.latitude, lng = pos.coords.longitude;
-        // store and update UI
-        savePosition(target, lat, lng);
-        computeAllEstimates();
-        alert('Lokasi berhasil di-set menggunakan GPS');
-      }, (err)=>{
-        alert('Gagal mendapat lokasi: ' + err.message);
-      }, {enableHighAccuracy:true, timeout:10000});
-    }
+          <label>Estimasi Tarif (Rp):</label>
+          <input type="text" id="tarif" class="form-control mb-3" readonly>
 
-    // Geocode address via Nominatim (OpenStreetMap)
-    async function geocodeAddressFor(target){
-      const fieldId = (target === 'drop')? 'dropText' : (target === 'k_drop')? 'k_dropText' : null;
-      if(!fieldId) return alert('Target geocode tidak dikenali');
-      const query = document.getElementById(fieldId.replace('Text','')).value || document.getElementById(fieldId).value;
-      // the UI uses single field id names; adjust:
-      let inputId = (target === 'drop')? 'dropText' : 'k_dropText';
-      const q = document.getElementById(inputId).value;
-      if(!q) return alert('Masukkan alamat yang ingin dicari pada kolom tujuan terlebih dahulu');
-      try {
-        const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`);
-        const data = await resp.json();
-        if(data && data[0]) {
-          const lat = parseFloat(data[0].lat), lon = parseFloat(data[0].lon);
-          savePosition(target, lat, lon);
-          alert('Alamat ditemukan dan diset pada peta');
-          computeAllEstimates();
-        } else {
-          alert('Alamat tidak ditemukan. Coba ketik alamat lebih spesifik atau pilih di peta.');
-        }
-      } catch(e){
-        alert('Gagal mencari alamat: ' + e);
-      }
-    }
-
-    // compute haversine distance (km)
-    function haversine(lat1, lon1, lat2, lon2){
-      function toRad(d){return d * Math.PI/180;}
-      const R = 6371; // km
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-
-    // fare calculation: 6000/km and rounding to 1000 with threshold 500
-    function calcFare(distanceKm){
-      if(!isFinite(distanceKm)) return null;
-      const tarifRaw = distanceKm * 6000;
-      // round to nearest rupiah thousand with rule:
-      const rem = tarifRaw % 1000;
-      let tarifRounded;
-      if(rem < 500) tarifRounded = tarifRaw - rem;
-      else tarifRounded = tarifRaw + (1000 - rem);
-      // ensure integer
-      tarifRounded = Math.round(tarifRounded);
-      return {raw: Math.round(tarifRaw), rounded: tarifRounded};
-    }
-
-    // compute and update UI for both antar and kirim
-    function computeAllEstimates(){
-      // Antar: needs positions['pickup'] and positions['drop']
-      if(positions['pickup'] && positions['drop']){
-        const a = positions['pickup'], b = positions['drop'];
-        const km = haversine(a.lat,a.lng,b.lat,b.lng);
-        const fare = calcFare(km);
-        document.getElementById('jarakText').innerText = km.toFixed(2) + ' km';
-        document.getElementById('tarifText').innerText = formatRp(fare.rounded);
-      }
-      // Kirim paket:
-      if(positions['k_pickup'] && positions['k_drop']){
-        const a = positions['k_pickup'], b = positions['k_drop'];
-        const km = haversine(a.lat,a.lng,b.lat,b.lng);
-        const fare = calcFare(km);
-        document.getElementById('k_jarakText').innerText = km.toFixed(2) + ' km';
-        document.getElementById('k_tarifText').innerText = formatRp(fare.rounded);
-      }
-    }
-
-    function formatRp(n){
-      if(n == null) return '-';
-      return 'Rp ' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    // Send WA for Antar
-    function sendAntarWA(){
-      const nama = document.querySelector('#formAntar [name="nama"]').value || '-';
-      const metode = document.getElementById('metodeBayarAntar').value;
-      if(!positions['pickup'] || !positions['drop']){
-        alert('Silakan set lokasi jemput dan tujuan terlebih dahulu.');
-        return;
-      }
-      const p = positions['pickup'], d = positions['drop'];
-      const km = haversine(p.lat,p.lng,d.lat,d.lng);
-      const fare = calcFare(km);
-      const msg = 
-`[Pesanan - Antar Jemput]
-Nama: ${nama}
-Metode Bayar: ${metode}
-
-Lokasi Jemput: ${p.label}
-Lokasi Tujuan: ${d.label}
-
-Jarak: ${km.toFixed(2)} km
-Tarif (6.000/km): ${formatRp(fare.rounded)}
-
-Silakan konfirmasi.`;
-      openWhatsApp(msg);
-    }
-
-    function sendKirimWA(){
-      const nama = document.querySelector('#formKirim [name="nama"]').value || '-';
-      const metode = document.getElementById('metodeBayarKirim').value;
-      if(!positions['k_pickup'] || !positions['k_drop']){
-        alert('Silakan set lokasi jemput dan tujuan paket terlebih dahulu.');
-        return;
-      }
-      const p = positions['k_pickup'], d = positions['k_drop'];
-      const km = haversine(p.lat,p.lng,d.lat,d.lng);
-      const fare = calcFare(km);
-      const msg = 
-`[Pesanan - Kirim Paket]
-Nama: ${nama}
-Metode Bayar: ${metode}
-
-Lokasi Jemput Paket: ${p.label}
-Lokasi Tujuan Paket: ${d.label}
-
-Jarak: ${km.toFixed(2)} km
-Tarif (6.000/km): ${formatRp(fare.rounded)}
-
-Silakan konfirmasi.`;
-      openWhatsApp(msg);
-    }
-
-    // simple services WT (Bersihin Rumah, dll)
-    function sendSimpleServiceWA(serviceName){
-      let form;
-      let nama, alamat, lokasiText, kebutuhan, est;
-      if(serviceName === 'Bersihin Rumah'){
-        form = document.getElementById('formBersihRumah');
-        nama = form.querySelector('[name="nama"]').value || '-';
-        alamat = document.getElementById('br_alamat').value || '-';
-        lokasiText = document.getElementById('br_loc_text').value || '-';
-        kebutuhan = document.getElementById('br_kebutuhan').value || '-';
-        est = document.getElementById('br_est').value || '-';
-      } else if(serviceName === 'Bersihin Kebun'){
-        form = document.getElementById('formBersihKebun');
-        nama = form.querySelector('[name="nama"]').value || '-';
-        alamat = document.getElementById('bk_alamat').value || '-';
-        lokasiText = document.getElementById('bk_loc_text').value || '-';
-        kebutuhan = document.getElementById('bk_kebutuhan').value || '-';
-        est = document.getElementById('bk_est').value || '-';
-      } else if(serviceName === 'Tempel Ban'){
-        form = document.getElementById('formTempel');
-        nama = form.querySelector('[name="nama"]').value || '-';
-        alamat = document.getElementById('tb_alamat').value || '-';
-        lokasiText = document.getElementById('tb_loc_text').value || '-';
-        kebutuhan = document.getElementById('tb_kebutuhan').value || '-';
-        est = document.getElementById('tb_est').value || '-';
-      } else if(serviceName === 'Tukang Bangunan'){
-        form = document.getElementById('formTukang');
-        nama = form.querySelector('[name="nama"]').value || '-';
-        alamat = document.getElementById('tk_alamat').value || '-';
-        lokasiText = document.getElementById('tk_loc_text').value || '-';
-        kebutuhan = document.getElementById('tk_kebutuhan').value || '-';
-        est = document.getElementById('tk_est').value || '-';
+          <button type="button" class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan ke Admin</button>
+        `;
       } else {
-        alert('Service not found');
-        return;
+        form.innerHTML = `
+          <label>Nama:</label>
+          <input type="text" id="nama" class="form-control mb-2" required>
+          <label>Alamat Lengkap:</label>
+          <input type="text" id="alamat" class="form-control mb-2" required>
+          <button class="btn btn-outline-success w-100 mb-2" type="button" onclick="setLocation('umum')">Set Lokasi</button>
+          <label>Kebutuhan Jasa:</label>
+          <textarea id="kebutuhan" class="form-control mb-2"></textarea>
+          <label>Pertanyaan Estimasi Biaya:</label>
+          <textarea id="estimasi" class="form-control mb-3"></textarea>
+          <button type="button" class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan ke Admin</button>
+        `;
       }
 
-      const msg = `[Pesanan - ${serviceName}]
-Nama: ${nama}
-Alamat Lengkap: ${alamat}
-Lokasi: ${lokasiText}
-Kebutuhan Jasa: ${kebutuhan}
-Pertanyaan Estimasi Biaya: ${est}
-
-Silakan konfirmasi.`;
-      openWhatsApp(msg);
+      new bootstrap.Modal(document.getElementById('formModal')).show();
     }
 
-    // open WA with prefilled message
-    function openWhatsApp(message){
-      const url = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
+    function setLocation(field) {
+      currentField = field;
+      if (!map) {
+        map = L.map('map').setView([-2.5489, 118.0149], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+      }
+      map.on('click', function(e) {
+        if (marker) marker.remove();
+        marker = L.marker(e.latlng).addTo(map);
+      });
+      new bootstrap.Modal(document.getElementById('mapModal')).show();
 
-    function openWAchat(){
-      const sample = "Halo Admin, saya ingin tanya layanan dan tarif.";
-      openWhatsApp(sample);
-    }
+      document.getElementById('confirmLocation').onclick = function() {
+        if (!marker) return alert('Klik pada peta untuk pilih lokasi.');
+        const { lat, lng } = marker.getLatLng();
+        const url = `https://www.google.com/maps?q=${lat},${lng}`;
 
-    // helper: when user pastes an address manually in dropText and presses enter, trigger search
-    document.addEventListener('DOMContentLoaded', function(){
-      // wire up ability to type into dropText (we left it editable)
-      const drop = document.getElementById('dropText');
-      const kdrop = document.getElementById('k_dropText');
-
-      // if user pastes gps link like "lat,lng" or google maps url, try to parse
-      function parseAndSetFromText(fieldId, target){
-        const v = document.getElementById(fieldId).value.trim();
-        if(!v) return;
-        // try to parse lat,lng pattern
-        const latlngMatch = v.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
-        if(latlngMatch){
-          const lat = parseFloat(latlngMatch[1]), lng = parseFloat(latlngMatch[2]);
-          savePosition(target, lat, lng);
-          computeAllEstimates();
-          return;
+        if (currentField === 'jemput') {
+          jemput = { lat, lng };
+          document.getElementById('lokasiJemput').value = url;
+        } else if (currentField === 'antar') {
+          antar = { lat, lng };
+          document.getElementById('lokasiAntar').value = url;
+          if (jemput) hitungJarakTarif();
+        } else {
+          document.getElementById('alamat').value = url;
         }
-        // try to parse Google Maps ?q=lat,lng or /@lat,lng
-        const gmatch = v.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || v.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-        if(gmatch){
-          const lat = parseFloat(gmatch[1]), lng = parseFloat(gmatch[2]);
-          savePosition(target, lat, lng);
-          computeAllEstimates();
-          return;
-        }
-        // if none matched, leave it for geocode button
+
+        bootstrap.Modal.getInstance(document.getElementById('mapModal')).hide();
+      };
+    }
+
+    function hitungJarakTarif() {
+      const R = 6371;
+      const dLat = (antar.lat - jemput.lat) * Math.PI / 180;
+      const dLon = (antar.lng - jemput.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2)**2 + Math.cos(jemput.lat*Math.PI/180) * Math.cos(antar.lat*Math.PI/180) * Math.sin(dLon/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const jarak = R * c;
+      document.getElementById('jarak').value = jarak.toFixed(2);
+
+      let tarif = jarak * 6000;
+      const sisa = tarif % 1000;
+      tarif = sisa < 500 ? tarif - sisa : tarif + (1000 - sisa);
+      document.getElementById('tarif').value = tarif.toFixed(0);
+    }
+
+    function kirimPesanan() {
+      let pesan = "Halo Admin, Saya ingin pesan jasa.\n";
+      const nama = document.getElementById('nama').value;
+
+      if (document.getElementById('lokasiJemput')) {
+        const jemput = document.getElementById('lokasiJemput').value;
+        const antar = document.getElementById('lokasiAntar').value;
+        const metode = document.getElementById('metode').value;
+        const jarak = document.getElementById('jarak').value;
+        const tarif = document.getElementById('tarif').value;
+        pesan += `Nama: ${nama}\nLokasi Jemput: ${jemput}\nTujuan: ${antar}\nMetode: ${metode}\nJarak: ${jarak} KM\nTarif: Rp${tarif}`;
+      } else {
+        const alamat = document.getElementById('alamat').value;
+        const kebutuhan = document.getElementById('kebutuhan').value;
+        const estimasi = document.getElementById('estimasi').value;
+        pesan += `Nama: ${nama}\nAlamat: ${alamat}\nKebutuhan: ${kebutuhan}\nPertanyaan: ${estimasi}`;
       }
 
-      drop.addEventListener('blur', ()=> parseAndSetFromText('dropText','drop'));
-      kdrop.addEventListener('blur', ()=> parseAndSetFromText('k_dropText','k_drop'));
-    });
-
-    // small improvement: if positions exist and modal closed, update estimates
-    document.addEventListener('visibilitychange', ()=> computeAllEstimates());
-
-    // done
+      const url = `https://wa.me/${adminNumber}?text=${encodeURIComponent(pesan)}`;
+      window.open(url, "_blank");
+    }
   </script>
 </body>
 </html>
