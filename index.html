@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Siap Suruh, Siap Antar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
     body {
-      background-color: #ffffff;
+      background-color: #fff;
       font-family: 'Poppins', sans-serif;
     }
     .banner {
-      background: linear-gradient(90deg, #2ecc71, #f39c12);
-      color: white;
+      background: linear-gradient(90deg, #27ae60, #f39c12);
+      color: #fff;
       text-align: center;
       padding: 15px;
       font-weight: bold;
@@ -25,9 +25,10 @@
     .menu-card {
       border-radius: 20px;
       transition: transform 0.2s;
+      background-color: #fff;
     }
     .menu-card:hover {
-      transform: scale(1.03);
+      transform: scale(1.05);
     }
     .menu-icon {
       width: 60px;
@@ -43,7 +44,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: white;
+      background: #fff;
       border-top: 2px solid #ccc;
       display: flex;
       justify-content: space-around;
@@ -52,12 +53,11 @@
     .bottom-nav button {
       border: none;
       background: none;
-      color: #2ecc71;
+      color: #27ae60;
       font-weight: bold;
     }
   </style>
 </head>
-
 <body>
 
   <div class="banner">SIAP SURUH, SIAP ANTAR</div>
@@ -65,7 +65,6 @@
   <div class="container my-4">
     <div class="row g-3 text-center">
 
-      <!-- Menu Antar Jemput -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('antar')">
           <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" class="menu-icon mx-auto mb-2">
@@ -73,7 +72,6 @@
         </div>
       </div>
 
-      <!-- Menu Kirim Paket -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('paket')">
           <img src="https://cdn-icons-png.flaticon.com/512/679/679720.png" class="menu-icon mx-auto mb-2">
@@ -81,7 +79,6 @@
         </div>
       </div>
 
-      <!-- Menu Bersihin Rumah -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('rumah')">
           <img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png" class="menu-icon mx-auto mb-2">
@@ -89,7 +86,6 @@
         </div>
       </div>
 
-      <!-- Menu Bersihin Kebun -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('kebun')">
           <img src="https://cdn-icons-png.flaticon.com/512/3319/3319221.png" class="menu-icon mx-auto mb-2">
@@ -97,7 +93,6 @@
         </div>
       </div>
 
-      <!-- Menu Tempel Ban -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('ban')">
           <img src="https://cdn-icons-png.flaticon.com/512/1041/1041852.png" class="menu-icon mx-auto mb-2">
@@ -105,7 +100,6 @@
         </div>
       </div>
 
-      <!-- Menu Tukang Bangunan -->
       <div class="col-6">
         <div class="card p-3 shadow menu-card" onclick="openForm('bangunan')">
           <img src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png" class="menu-icon mx-auto mb-2">
@@ -116,22 +110,20 @@
     </div>
   </div>
 
-  <!-- Popup Form -->
+  <!-- Modal Form -->
   <div class="modal fade" id="formModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="formTitle"></h5>
+          <h5 id="formTitle"></h5>
           <button class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <form id="orderForm"></form>
-        </div>
+        <div class="modal-body" id="formBody"></div>
       </div>
     </div>
   </div>
 
-  <!-- Map Modal -->
+  <!-- Modal Map -->
   <div class="modal fade" id="mapModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -141,7 +133,7 @@
         </div>
         <div class="modal-body">
           <div id="map"></div>
-          <button class="btn btn-success w-100 mt-3" id="confirmLocation">Konfirmasi Lokasi</button>
+          <button id="confirmLocation" class="btn btn-success w-100 mt-3">Konfirmasi Lokasi</button>
         </div>
       </div>
     </div>
@@ -157,12 +149,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    const adminNumber = "6285157077789";
+    const admin = "6285157077789";
     let map, marker, currentField = null;
     let jemput = null, antar = null;
 
     function openForm(type) {
-      const titleMap = {
+      const title = {
         antar: "Form Jasa Antar",
         paket: "Form Kirim Paket",
         rumah: "Form Bersihin Rumah",
@@ -170,23 +162,21 @@
         ban: "Form Tempel Ban",
         bangunan: "Form Tukang Bangunan"
       };
+      document.getElementById("formTitle").innerText = title[type];
 
-      document.getElementById('formTitle').innerText = titleMap[type];
-      const form = document.getElementById('orderForm');
-      form.innerHTML = '';
-
-      if (type === 'antar' || type === 'paket') {
-        form.innerHTML = `
+      let html = "";
+      if (type === "antar" || type === "paket") {
+        html = `
           <label>Nama:</label>
-          <input type="text" id="nama" class="form-control mb-2" required>
-          
+          <input id="nama" class="form-control mb-2" placeholder="Masukkan nama">
+
           <label>Lokasi Jemputan:</label>
-          <input type="text" id="lokasiJemput" class="form-control mb-2" readonly>
-          <button class="btn btn-outline-success w-100 mb-2" type="button" onclick="setLocation('jemput')">Set Lokasi Jemputan</button>
-          
+          <input id="lokasiJemput" class="form-control mb-2" readonly>
+          <button class="btn btn-outline-success w-100 mb-2" onclick="setLocation('jemput')">Set Lokasi Jemputan</button>
+
           <label>Tujuan Antar:</label>
-          <input type="text" id="lokasiAntar" class="form-control mb-2" readonly>
-          <button class="btn btn-outline-warning w-100 mb-2" type="button" onclick="setLocation('antar')">Set Lokasi Tujuan</button>
+          <input id="lokasiAntar" class="form-control mb-2" placeholder="Ketik atau set lokasi tujuan">
+          <button class="btn btn-outline-warning w-100 mb-2" onclick="setLocation('antar')">Set Lokasi Tujuan</button>
 
           <label>Metode Bayar:</label>
           <select id="metode" class="form-select mb-2">
@@ -196,99 +186,112 @@
           </select>
 
           <label>Estimasi Jarak (KM):</label>
-          <input type="text" id="jarak" class="form-control mb-2" readonly>
+          <input id="jarak" class="form-control mb-2" readonly>
 
           <label>Estimasi Tarif (Rp):</label>
-          <input type="text" id="tarif" class="form-control mb-3" readonly>
+          <input id="tarif" class="form-control mb-3" readonly>
 
-          <button type="button" class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan ke Admin</button>
+          <button class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan via WhatsApp</button>
         `;
       } else {
-        form.innerHTML = `
+        html = `
           <label>Nama:</label>
-          <input type="text" id="nama" class="form-control mb-2" required>
+          <input id="nama" class="form-control mb-2" placeholder="Masukkan nama">
+
           <label>Alamat Lengkap:</label>
-          <input type="text" id="alamat" class="form-control mb-2" required>
-          <button class="btn btn-outline-success w-100 mb-2" type="button" onclick="setLocation('umum')">Set Lokasi</button>
+          <input id="alamat" class="form-control mb-2">
+
+          <button class="btn btn-outline-success w-100 mb-2" onclick="setLocation('umum')">Set Lokasi</button>
+
           <label>Kebutuhan Jasa:</label>
           <textarea id="kebutuhan" class="form-control mb-2"></textarea>
+
           <label>Pertanyaan Estimasi Biaya:</label>
           <textarea id="estimasi" class="form-control mb-3"></textarea>
-          <button type="button" class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan ke Admin</button>
+
+          <button class="btn btn-success w-100" onclick="kirimPesanan()">Kirim Pesanan via WhatsApp</button>
         `;
       }
 
-      new bootstrap.Modal(document.getElementById('formModal')).show();
+      document.getElementById("formBody").innerHTML = html;
+      new bootstrap.Modal(document.getElementById("formModal")).show();
     }
 
     function setLocation(field) {
       currentField = field;
       if (!map) {
         map = L.map('map').setView([-2.5489, 118.0149], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(map);
       }
-      map.on('click', function(e) {
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          map.setView([pos.coords.latitude, pos.coords.longitude], 15);
+        });
+      }
+
+      map.off('click').on('click', e => {
         if (marker) marker.remove();
         marker = L.marker(e.latlng).addTo(map);
       });
-      new bootstrap.Modal(document.getElementById('mapModal')).show();
 
-      document.getElementById('confirmLocation').onclick = function() {
-        if (!marker) return alert('Klik pada peta untuk pilih lokasi.');
+      document.getElementById("confirmLocation").onclick = () => {
+        if (!marker) return alert("Klik lokasi di peta terlebih dahulu!");
         const { lat, lng } = marker.getLatLng();
         const url = `https://www.google.com/maps?q=${lat},${lng}`;
-
-        if (currentField === 'jemput') {
+        if (field === "jemput") {
           jemput = { lat, lng };
-          document.getElementById('lokasiJemput').value = url;
-        } else if (currentField === 'antar') {
+          document.getElementById("lokasiJemput").value = url;
+        } else if (field === "antar") {
           antar = { lat, lng };
-          document.getElementById('lokasiAntar').value = url;
+          document.getElementById("lokasiAntar").value = url;
           if (jemput) hitungJarakTarif();
         } else {
-          document.getElementById('alamat').value = url;
+          document.getElementById("alamat").value = url;
         }
-
-        bootstrap.Modal.getInstance(document.getElementById('mapModal')).hide();
+        bootstrap.Modal.getInstance(document.getElementById("mapModal")).hide();
       };
+
+      new bootstrap.Modal(document.getElementById("mapModal")).show();
     }
 
     function hitungJarakTarif() {
       const R = 6371;
       const dLat = (antar.lat - jemput.lat) * Math.PI / 180;
       const dLon = (antar.lng - jemput.lng) * Math.PI / 180;
-      const a = Math.sin(dLat/2)**2 + Math.cos(jemput.lat*Math.PI/180) * Math.cos(antar.lat*Math.PI/180) * Math.sin(dLon/2)**2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(jemput.lat * Math.PI / 180) * Math.cos(antar.lat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const jarak = R * c;
-      document.getElementById('jarak').value = jarak.toFixed(2);
+      document.getElementById("jarak").value = jarak.toFixed(2);
 
       let tarif = jarak * 6000;
       const sisa = tarif % 1000;
       tarif = sisa < 500 ? tarif - sisa : tarif + (1000 - sisa);
-      document.getElementById('tarif').value = tarif.toFixed(0);
+      document.getElementById("tarif").value = tarif.toFixed(0);
     }
 
     function kirimPesanan() {
-      let pesan = "Halo Admin, Saya ingin pesan jasa.\n";
-      const nama = document.getElementById('nama').value;
+      const nama = document.getElementById("nama").value;
+      let pesan = `Halo Admin, Saya ingin memesan jasa.\nNama: ${nama}\n`;
 
-      if (document.getElementById('lokasiJemput')) {
-        const jemput = document.getElementById('lokasiJemput').value;
-        const antar = document.getElementById('lokasiAntar').value;
-        const metode = document.getElementById('metode').value;
-        const jarak = document.getElementById('jarak').value;
-        const tarif = document.getElementById('tarif').value;
-        pesan += `Nama: ${nama}\nLokasi Jemput: ${jemput}\nTujuan: ${antar}\nMetode: ${metode}\nJarak: ${jarak} KM\nTarif: Rp${tarif}`;
+      if (document.getElementById("lokasiJemput")) {
+        pesan += `Lokasi Jemput: ${document.getElementById("lokasiJemput").value}\n`;
+        pesan += `Tujuan Antar: ${document.getElementById("lokasiAntar").value}\n`;
+        pesan += `Metode Bayar: ${document.getElementById("metode").value}\n`;
+        pesan += `Jarak: ${document.getElementById("jarak").value} KM\n`;
+        pesan += `Tarif: Rp ${document.getElementById("tarif").value}\n`;
       } else {
-        const alamat = document.getElementById('alamat').value;
-        const kebutuhan = document.getElementById('kebutuhan').value;
-        const estimasi = document.getElementById('estimasi').value;
-        pesan += `Nama: ${nama}\nAlamat: ${alamat}\nKebutuhan: ${kebutuhan}\nPertanyaan: ${estimasi}`;
+        pesan += `Alamat: ${document.getElementById("alamat").value}\n`;
+        pesan += `Kebutuhan Jasa: ${document.getElementById("kebutuhan").value}\n`;
+        pesan += `Pertanyaan Estimasi: ${document.getElementById("estimasi").value}\n`;
       }
 
-      const url = `https://wa.me/${adminNumber}?text=${encodeURIComponent(pesan)}`;
+      const url = `https://wa.me/${admin}?text=${encodeURIComponent(pesan)}`;
       window.open(url, "_blank");
     }
   </script>
+
 </body>
 </html>
